@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers"
 
-export function middleware(request) {
+export async function middleware(request) {
     const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
     const devEval =
         process.env.NODE_ENV === "development" ? `'unsafe-eval'` : "";
@@ -33,12 +33,14 @@ export function middleware(request) {
         contentSecurityPolicyHeaderValue
     );
 
+    let head = await headers();
+
     requestHeaders.set("x-nonce", nonce);
     requestHeaders.set("x-frame-options", "DENY");
     requestHeaders.set("x-content-type-options", "nosniff");
     requestHeaders.set(
         "Access-Control-Allow-Origin",
-        headers().get("host")
+        head.get("host")
     );
 
     const response = NextResponse.next({
