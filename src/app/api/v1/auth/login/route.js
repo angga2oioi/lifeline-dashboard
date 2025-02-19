@@ -9,11 +9,12 @@ import { createTokens, handleLogin, setAuthCookies, validateCookies } from "@/se
 export async function POST(request, { params }) {
     try {
 
+        const cookieStore = await cookies()
         const body = await request.json();
         let account = await handleLogin(body)
 
         let { accessToken, refreshToken } = createTokens(account)
-        setAuthCookies(cookies, accessToken, refreshToken)
+        setAuthCookies(cookieStore, accessToken, refreshToken)
 
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,

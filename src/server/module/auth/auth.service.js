@@ -15,8 +15,8 @@ export const createTokens = (account) => {
 };
 
 export const setAuthCookies = (cookies, accessToken, refreshToken) => {
-    cookies().set(ACCOUNT_COOKIE_NAME, accessToken, COOKIE_OPTIONS);
-    cookies().set(REFRESH_TOKEN_COOKIE_NAME, refreshToken, REFRESH_COOKIE_OPTIONS);
+    cookies.set(ACCOUNT_COOKIE_NAME, accessToken, COOKIE_OPTIONS);
+    cookies.set(REFRESH_TOKEN_COOKIE_NAME, refreshToken, REFRESH_COOKIE_OPTIONS);
     return null
 };
 
@@ -41,8 +41,8 @@ const handleCookieRenewal = (refreshToken) => {
 export const validateCookies = async (cookies) => {
     let cookieStore = await cookies()
 
-    let token = cookieStore()?.get(ACCOUNT_COOKIE_NAME)?.value
-    let refreshToken = cookieStore()?.get(REFRESH_TOKEN_COOKIE_NAME)?.value
+    let token = cookieStore.get(ACCOUNT_COOKIE_NAME)?.value
+    let refreshToken = cookieStore.get(REFRESH_TOKEN_COOKIE_NAME)?.value
     if (!token || !refreshToken) {
         return {};
     }

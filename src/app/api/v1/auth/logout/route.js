@@ -9,7 +9,7 @@ export async function POST(request, { params }) {
     try {
         const cookieStore = await cookies()
 
-        cookieStore().set(ACCOUNT_COOKIE_NAME, "", {
+        cookieStore.set(ACCOUNT_COOKIE_NAME, "", {
             path: "/",
             maxAge: 1,
             httpOnly: true,
@@ -17,7 +17,7 @@ export async function POST(request, { params }) {
             sameSite: "strict",
         });
 
-        cookieStore().set(REFRESH_TOKEN_COOKIE_NAME, "", {
+        cookieStore.set(REFRESH_TOKEN_COOKIE_NAME, "", {
             path: "/",
             maxAge: 1,
             httpOnly: true,
