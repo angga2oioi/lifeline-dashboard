@@ -24,6 +24,7 @@ const ServiceSchema = new mongoose.Schema(
 
 ServiceSchema.index({ createdAt: 1 });
 ServiceSchema.index({ updatedAt: 1 });
+ServiceSchema.index({ project: 1, name: 1 }, { unique: true })
 
 // add plugin that converts mongoose to json
 ServiceSchema.plugin(toJSON);

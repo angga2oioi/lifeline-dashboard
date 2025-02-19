@@ -85,3 +85,11 @@ export const parseSortBy = (sortBy) => {
 
     return sortField;
 };
+
+export const createSlug = (string) => {
+    return string
+        .toLowerCase()
+        .replace(/ /g, "-")
+        .replace(/[^\w-]+/g, "")
+        .replace(/-{2,}/g, "-");
+};
