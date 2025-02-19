@@ -6,7 +6,8 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { validateCookies } from "@/server/module/auth/auth.service";
 import { canIManage } from "@/server/module/account/account.service";
-import {  amIAMember, findProjectById, removeProject } from "@/server/module/project/project.service";
+import { amIAMember } from "@/server/module/project/project.service";
+import { findServiceById, removeService, updateService } from "@/server/module/service/service.service";
 
 export async function DELETE(request, { params }) {
     try {
@@ -21,12 +22,17 @@ export async function DELETE(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        const isMember = await amIAMember(account?.id, params?.id)
+        const service = await findServiceById(params?.id)
+        if (!service) {
+            throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
+        }
+
+        const isMember = await amIAMember(account?.id, service?.project?.toString())
         if (!isMember) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        await removeProject(params?.id)
+        await removeService(params?.id)
 
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,
@@ -47,12 +53,49 @@ export async function GET(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE);
         }
 
-        const isMember = await amIAMember(account?.id, params?.id)
+        const service = await findServiceById(params?.id)
+        if (!service) {
+            throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
+        }
+
+        const isMember = await amIAMember(account?.id, service?.project?.id)
         if (!isMember) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        let data = await findProjectById(params?.id)
+        return NextResponse.json({
+            error: SUCCESS_ERR_CODE,
+            message: SUCCESS_ERR_MESSAGE,
+            data: service
+        });
+
+
+    } catch (e) {
+        return NextResponse.json(parseError(e), { status: e?.error || 400 });
+    }
+}
+
+export async function PUT(request, { params }) {
+    try {
+
+        const { account, token } = await validateCookies(cookies);
+        if (!token) {
+            throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE);
+        }
+
+        const service = await findServiceById(params?.id)
+        if (!service) {
+            throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
+        }
+
+        const isMember = await amIAMember(account?.id, service?.project?.id)
+        if (!isMember) {
+            throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
+        }
+
+        const body = await request.json();
+
+        let data = await updateService(service?.id, body)
 
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,

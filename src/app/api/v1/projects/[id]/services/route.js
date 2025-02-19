@@ -6,9 +6,10 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { validateCookies } from "@/server/module/auth/auth.service";
 import { canIManage } from "@/server/module/account/account.service";
-import {  amIAMember, findProjectById, removeProject } from "@/server/module/project/project.service";
+import { amIAMember, findProjectById, removeProject } from "@/server/module/project/project.service";
+import { createService, paginateService } from "@/server/module/service/service.service";
 
-export async function DELETE(request, { params }) {
+export async function POST(request, { params }) {
     try {
 
         const { account, token } = await validateCookies(cookies);
@@ -26,11 +27,17 @@ export async function DELETE(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        await removeProject(params?.id)
+        const body = await request.json();
+
+        let data = await createService({
+            ...body,
+            project: params?.id
+        })
 
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,
             message: SUCCESS_ERR_MESSAGE,
+            data
         });
 
 
@@ -52,7 +59,16 @@ export async function GET(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        let data = await findProjectById(params?.id)
+        const { searchParams } = new URL(request.nextUrl);
+
+        let {
+            search,
+            sortBy,
+            limit,
+            page
+        } = Object.fromEntries(searchParams.entries())
+
+        let data = await paginateService({ search, project: params?.id }, sortBy, limit, page)
 
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,
