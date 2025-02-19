@@ -69,6 +69,26 @@ export const createAccount = async (params) => {
 
 }
 
+export const resetPassword = async (id) => {
+    const account = await accountModel.findById(id)
+    if (!account) {
+        throw HttpError(NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE)
+    }
+
+    const newPassword = Randomstring.generate(6)
+
+    var salt = bcrypt.genSaltSync(10);
+    var hash = bcrypt.hashSync(newPassword, salt);
+
+    await accountModel.findByIdAndUpdate(id, {
+        $set: {
+            password: hash
+        }
+    })
+
+    return newPassword
+}
+
 export const changePassword = async (id, params) => {
     const account = await accountModel.findById(id)
     if (!account) {
