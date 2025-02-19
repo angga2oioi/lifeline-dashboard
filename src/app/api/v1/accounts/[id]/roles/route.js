@@ -15,7 +15,7 @@ export async function PATCH(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE);
         }
 
-        const canManage = await canIManage(account?.indexOf, MANAGE_ACCOUNT_ROLES)
+        const canManage = await canIManage(account?.id, MANAGE_ACCOUNT_ROLES)
         if (!canManage) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
