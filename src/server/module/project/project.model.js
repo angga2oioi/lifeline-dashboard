@@ -1,6 +1,6 @@
 //@ts-check
 import mongoose from "../../utils/mongoose";
-import { toJSON, paginate } from "../../utils/mongoose/plugins";
+import { toJSON, paginate,aggregatePaginate } from "../../utils/mongoose/plugins";
 
 const { String, Mixed } = mongoose.Schema.Types;
 
@@ -28,6 +28,7 @@ ProjectSchema.index({ updatedAt: 1 });
 // add plugin that converts mongoose to json
 ProjectSchema.plugin(toJSON);
 ProjectSchema.plugin(paginate);
+ProjectSchema.plugin(aggregatePaginate);
 
 export default mongoose.models.Project ||
     mongoose.model("Project", ProjectSchema);
