@@ -7,7 +7,7 @@ import { cookies } from "next/headers";
 import { validateCookies } from "@/server/module/auth/auth.service";
 import { canIManage } from "@/server/module/account/account.service";
 import { amIAMember, findProjectById, removeProject } from "@/server/module/project/project.service";
-import { createService, paginateService } from "@/server/module/service/service.service";
+import { createService, listService, paginateService } from "@/server/module/service/service.service";
 
 export async function POST(request, { params }) {
     try {
@@ -59,16 +59,8 @@ export async function GET(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        const { searchParams } = new URL(request.nextUrl);
 
-        let {
-            search,
-            sortBy,
-            limit,
-            page
-        } = Object.fromEntries(searchParams.entries())
-
-        let data = await paginateService({ search, project: params?.id }, sortBy, limit, page)
+        let data = await listService({ project: params?.id })
 
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,

@@ -208,6 +208,58 @@ export const paginateProject = async (query, sortBy, limit, page) => {
 
 }
 
+export const listProject = async (query, sortBy, limit, page) => {
+    let {
+        accountQuery,
+        projectQuery
+    } = buildProjectSearchQuery(query)
+    page = minMaxNum(page, 1)
+    limit = minMaxNum(limit, 1, 50)
+
+    const sort = parseSortBy(sortBy)
+
+    const aggregate = await projectModel.aggregate([
+        {
+            $match: projectQuery
+        },
+        {
+            $lookup: {
+                from: "projectaccounts",
+                localField: "_id",
+                foreignField: "project",
+                as: "accounts"
+            }
+        },
+        {
+            $match: accountQuery
+        },
+        {
+            $project: {
+                _id: 1,
+                name: 1,
+                createdAt: 1,
+                accounts: 0
+            }
+        },
+        {
+            $sort: {
+                ...sort
+            }
+        }
+    ])
+
+    let list = aggregate?.map((n) => {
+        return {
+            id: n?._id?.toString(),
+            name: n?.name,
+            createdAt: n?.createdAt,
+        }
+    })
+
+    return list
+
+}
+
 export const removeProject = async (id) => {
 
     let raw = await projectModel.findById(id)
@@ -261,14 +313,14 @@ export const validateProjectSignature = async (headers, body = {}, query = {}) =
     return project;
 };
 
-export const amIAMember = async(accountId,projectId)=>{
+export const amIAMember = async (accountId, projectId) => {
 
     const raw = await projectAccountModel.findOne({
         project: new ObjectId(projectId),
-        account:new ObjectId(accountId)
+        account: new ObjectId(accountId)
     })
 
-    if(!raw){
+    if (!raw) {
         return false
     }
 

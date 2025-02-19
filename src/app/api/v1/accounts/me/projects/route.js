@@ -5,7 +5,7 @@ import { HttpError, parseError } from "@/global/utils/functions";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { validateCookies } from "@/server/module/auth/auth.service";
-import { createProject, paginateProject } from "@/server/module/project/project.service";
+import { createProject, listProject, paginateProject } from "@/server/module/project/project.service";
 import { canIManage } from "@/server/module/account/account.service";
 
 export async function GET(request, { params }) {
@@ -16,17 +16,7 @@ export async function GET(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE);
         }
 
-
-        const { searchParams } = new URL(request.nextUrl);
-
-        let {
-            search,
-            sortBy,
-            limit,
-            page
-        } = Object.fromEntries(searchParams.entries())
-
-        let data = await paginateProject({ search, account: account?.id }, sortBy, limit, page)
+        let data = await listProject({ account: account?.id })
 
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,

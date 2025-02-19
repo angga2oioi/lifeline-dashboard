@@ -111,3 +111,14 @@ export const paginateService = async (query, sortBy = "createdAt:desc", limit = 
 
     return list
 }
+
+export const listService = async (query, sortBy = "createdAt:desc", limit = 10, page = 1) => {
+    let queryParams = buildServiceSearchQuery(query)
+    
+    let list = await serviceModel.find(queryParams)
+    list = list?.map((n) => {
+        return n?.toJSON()
+    })
+
+    return list
+}
