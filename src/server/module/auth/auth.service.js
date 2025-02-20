@@ -9,7 +9,7 @@ import * as bcrypt from "bcryptjs"
 
 export const createTokens = (account) => {
     const accessToken = jwt.sign({ id: account.id, username: account?.username, roles: account?.roles }, process?.env?.ACCOUNT_TOKEN_JWT_SECRET, { expiresIn: 60 * 60 });
-    const refreshToken = jwt.sign({ id: account.id, username: account?.username, roles: account?.roles }, process?.env?.REFRES_TOKEN_JWT_SECRET, { expiresIn: 24 * 60 * 60 });
+    const refreshToken = jwt.sign({ id: account.id, username: account?.username, roles: account?.roles }, process?.env?.REFRESH_TOKEN_JWT_SECRET, { expiresIn: 24 * 60 * 60 });
 
     return { accessToken, refreshToken };
 };
@@ -22,7 +22,7 @@ export const setAuthCookies = (cookies, accessToken, refreshToken) => {
 
 const handleCookieRenewal = (refreshToken) => {
     try {
-        const decoded = jwt.verify(refreshToken, process?.env?.REFRES_TOKEN_JWT_SECRET);
+        const decoded = jwt.verify(refreshToken, process?.env?.REFRESH_TOKEN_JWT_SECRET);
 
         // Generate new tokens
         const { accessToken, refreshToken: newRefreshToken } = createTokens(decoded);
