@@ -316,8 +316,8 @@ export const validateProjectSignature = async (headers, body = {}, query = {}) =
 export const amIAMember = async (accountId, projectId) => {
 
     const raw = await projectAccountModel.findOne({
-        project: new ObjectId(projectId),
-        account: new ObjectId(accountId)
+        project: new ObjectId(projectId?.toString()),
+        account: new ObjectId(accountId?.toString())
     })
 
     if (!raw) {

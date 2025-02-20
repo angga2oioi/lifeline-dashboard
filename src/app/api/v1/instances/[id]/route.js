@@ -8,6 +8,7 @@ import { validateCookies } from "@/server/module/auth/auth.service";
 import { canIManage } from "@/server/module/account/account.service";
 import { amIAMember } from "@/server/module/project/project.service";
 import { findServiceById, removeService, updateService } from "@/server/module/service/service.service";
+import { findInstanceById, removeInstance } from "@/server/module/instance/instance.service";
 
 export async function DELETE(request, { params }) {
     try {
@@ -22,17 +23,17 @@ export async function DELETE(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        const service = await findServiceById(params?.id)
-        if (!service) {
+        const instance = await findInstanceById(params?.id)
+        if (!instance) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        const isMember = await amIAMember(account?.id, service?.project?.toString())
+        const isMember = await amIAMember(account?.id, instance?.project?.toString())
         if (!isMember) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        await removeService(params?.id)
+        await removeInstance(params?.id)
 
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,
@@ -53,12 +54,12 @@ export async function GET(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE);
         }
 
-        const service = await findServiceById(params?.id)
-        if (!service) {
+        const instance = await findInstanceById(params?.id)
+        if (!instance) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        const isMember = await amIAMember(account?.id, service?.project?.id)
+        const isMember = await amIAMember(account?.id, instance?.project?.toString())
         if (!isMember) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
@@ -66,7 +67,7 @@ export async function GET(request, { params }) {
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,
             message: SUCCESS_ERR_MESSAGE,
-            data: service
+            data: instance
         });
 
 
@@ -88,7 +89,7 @@ export async function PUT(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        const isMember = await amIAMember(account?.id, service?.project?.toString())
+        const isMember = await amIAMember(account?.id, service?.project?.id)
         if (!isMember) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }

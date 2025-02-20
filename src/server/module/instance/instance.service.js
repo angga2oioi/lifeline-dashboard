@@ -12,9 +12,9 @@ const { ObjectId } = mongoose.Types
 
 export const createInstance = async (params) => {
   const v = new Validator(params, {
-    slug: "required|string",
     project: "require|string",
-    service: "require|string"
+    serviceId: "require|string",
+    instanceId:"required|string"
   });
 
   let match = await v.check();
@@ -24,8 +24,8 @@ export const createInstance = async (params) => {
 
   const testData = await instanceModel.findOne({
     project: new ObjectId(params?.project),
-    service: new ObjectId(params?.service),
-    slug: createSlug(params?.slug),
+    service: new ObjectId(params?.serviceId),
+    slug: createSlug(params?.instanceId),
   })
 
   if (testData) {
@@ -37,7 +37,7 @@ export const createInstance = async (params) => {
     throw HttpError(NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE)
   }
 
-  const service = await serviceModel.findById(params?.service)
+  const service = await serviceModel.findById(params?.serviceId)
   if (!service || (service?.project && service?.project?.toString() !== project?._id?.toString())) {
     throw HttpError(NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE)
   }
@@ -45,16 +45,16 @@ export const createInstance = async (params) => {
   const raw = await instanceModel.create({
     project: project?._id,
     service: service._id,
-    slug: createSlug(params?.slug),
+    slug: createSlug(params?.instanceId),
   })
 
   return raw?.toJSON()
 
 }
 
-export const removeInstance = async (slug) => {
+export const removeInstance = async (id) => {
 
-  const raw = await instanceModel.findOne({ slug })
+  const raw = await instanceModel.findById(id)
   if (!raw) {
     throw HttpError(NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE)
   }
@@ -62,6 +62,17 @@ export const removeInstance = async (slug) => {
   await instanceModel.findByIdAndDelete(raw?._id?.toString())
 
   return null
+
+}
+
+export const findInstanceById = async (id) => {
+
+  const raw = await instanceModel.findById(id)
+  if (!raw) {
+    throw HttpError(NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE)
+  }
+
+  return raw?.toJSON()
 
 }
 
