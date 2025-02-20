@@ -310,7 +310,7 @@ export const validateProjectSignature = async (headers, body = {}, query = {}) =
         throw HttpError(NO_ACCESS_ERR_CODE, `Invalid signature`);
     }
 
-    return project;
+    return project?.toJSON();
 };
 
 export const amIAMember = async (accountId, projectId) => {

@@ -22,6 +22,16 @@ export const createInstance = async (params) => {
     throw HttpError(INVALID_INPUT_ERR_CODE, v.errors);
   }
 
+  const testData = await instanceModel.findOne({
+    project: new ObjectId(params?.project),
+    service: new ObjectId(params?.service),
+    slug: createSlug(params?.slug),
+  })
+
+  if (testData) {
+    return testData?.toJSON()
+  }
+
   const project = await projectModel.findById(params?.project)
   if (!project) {
     throw HttpError(NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE)
@@ -30,16 +40,6 @@ export const createInstance = async (params) => {
   const service = await serviceModel.findById(params?.service)
   if (!service || (service?.project && service?.project?.toString() !== project?._id?.toString())) {
     throw HttpError(NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE)
-  }
-
-  const testData = await instanceModel.findOne({
-    project: project?._id,
-    service: service._id,
-    slug: createSlug(params?.slug),
-  })
-
-  if (testData) {
-    return testData?.toJSON()
   }
 
   const raw = await instanceModel.create({
