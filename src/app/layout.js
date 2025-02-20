@@ -1,5 +1,9 @@
-import App from "@/client/views/_app";
+import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
+import "@mantine/core/styles.layer.css";
+import "mantine-contextmenu/styles.layer.css";
 import "./globals.css";
+import App from "@/client/views/_app";
 import { headers } from "next/headers";
 
 export default async function RootLayout({ children }) {
