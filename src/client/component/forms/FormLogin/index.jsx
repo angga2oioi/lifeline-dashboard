@@ -3,7 +3,6 @@ import React from "react";
 import { TextInput } from "@mantine/core"
 import { useForm } from '@mantine/form';
 import { PrimaryButton } from "../../buttons/PrimaryButton";
-import { InputText } from "../../inputs/InputText";
 
 
 const FormLogin = ({ onSubmit }) => {
@@ -21,13 +20,13 @@ const FormLogin = ({ onSubmit }) => {
                 className="w-full space-y-2"
                 onSubmit={form.onSubmit(onSubmit)}
             >
-                <InputText
+                <TextInput
                     withAsterisk
                     label="Username"
                     key={form.key('username')}
                     {...form.getInputProps('username')}
                 />
-                <InputText
+                <TextInput
                     type="password"
                     label="Password"
                     key={form.key('password')}

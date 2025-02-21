@@ -13,3 +13,10 @@ export const accountLogin = async (payload) => {
     return data.data
 
 }
+
+export const setupAccount = async (payload) => {
+
+    const { data } = await Axios.post(`/v1/auths/setup`, payload)
+    return data.data
+
+}

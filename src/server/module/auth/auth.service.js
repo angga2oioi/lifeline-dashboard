@@ -1,6 +1,6 @@
 //@ts-check
 
-import { ACCOUNT_COOKIE_NAME, COOKIE_OPTIONS, INVALID_INPUT_ERR_CODE, NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE, REFRESH_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_NAME } from "@/global/utils/constant";
+import { ACCOUNT_COOKIE_NAME, COOKIE_OPTIONS, INVALID_INPUT_ERR_CODE, MANAGE_ACCOUNT_ROLES, NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE, REFRESH_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_NAME } from "@/global/utils/constant";
 import { HttpError } from "@/global/utils/functions";
 import jwt from "jsonwebtoken"
 import { Validator } from "node-input-validator";
@@ -102,4 +102,16 @@ export const handleLogin = async (params) => {
 
 
     return account?.toJSON();
+}
+
+export const isSetupNeeded = async () => {
+    const accounts = await accountModel.find({
+        roles: MANAGE_ACCOUNT_ROLES
+    })
+
+    if (accounts?.length < 1) {
+        return true
+    }
+
+    return false
 }

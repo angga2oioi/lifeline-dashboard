@@ -1,6 +1,6 @@
 //@ts-check
 
-import { INVALID_INPUT_ERR_CODE, NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE } from "@/global/utils/constant";
+import { INVALID_INPUT_ERR_CODE, MANAGE_ACCOUNT_ROLES, MANAGE_PROJECT_ROLES, NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE } from "@/global/utils/constant";
 import { HttpError, minMaxNum } from "@/global/utils/functions";
 import { Validator } from "node-input-validator";
 import projectModel from "../project/project.model";
@@ -10,6 +10,39 @@ import Randomstring from "randomstring";
 import striptags from "striptags";
 import projectAccountModel from "../project/project.account.model";
 import mongoose from "mongoose";
+
+export const setupAccount = async (params) => {
+    const v = new Validator(params, {
+        username: "required|string",
+        password: "required|string",
+    });
+
+    let match = await v.check();
+    if (!match) {
+        throw HttpError(INVALID_INPUT_ERR_CODE, v.errors);
+    }
+
+    // create new account
+    const account = await createAccount({
+        username: params?.username,
+        roles: [
+            MANAGE_ACCOUNT_ROLES,
+            MANAGE_PROJECT_ROLES
+        ]
+    })
+
+    // create new password for that account
+    const password = await resetPassword(account?.id)
+
+    // update the password with one that submitted
+    await changePassword(account?.id, {
+        oldpassword: password,
+        newpassword: params?.password,
+        repassword: params?.password,
+    })
+
+    return account
+}
 
 export const createAccount = async (params) => {
     const v = new Validator(params, {
