@@ -18,6 +18,7 @@ export const MANAGE_PROJECT_ROLES = "MANAGE_PROJECT";
 
 export const ACCOUNT_COOKIE_NAME = "ACCOUNT";
 export const REFRESH_TOKEN_COOKIE_NAME = "REFRESH_TOKEN";
+export const CSRF_TOKEN_COOKIE_NAME = "CSRF_TOKEN";
 
 export const COOKIE_OPTIONS = {
     httpOnly: true,

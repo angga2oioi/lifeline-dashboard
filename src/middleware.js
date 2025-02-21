@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
-import { headers } from "next/headers"
+import { cookies, headers } from "next/headers"
+import { COOKIE_OPTIONS, CSRF_TOKEN_COOKIE_NAME } from "./global/utils/constant";
 
 export async function middleware(request) {
     const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+
+
     const devEval =
         process.env.NODE_ENV === "development" ? `'unsafe-eval'` : "";
     const devInline = `'unsafe-inline'`;
@@ -34,6 +37,12 @@ export async function middleware(request) {
     );
 
     let head = await headers();
+    let cookieStore = await cookies()
+    let csrfCookie = cookieStore.get(CSRF_TOKEN_COOKIE_NAME)?.value
+    if (!csrfCookie) {
+        csrfCookie = Buffer.from(crypto.randomUUID()).toString("base64");
+        cookieStore.set(CSRF_TOKEN_COOKIE_NAME, csrfCookie, COOKIE_OPTIONS);
+    }
 
     requestHeaders.set("x-nonce", nonce);
     requestHeaders.set("x-frame-options", "DENY");
@@ -63,7 +72,7 @@ export const config = {
          * - favicon.ico (favicon file)
          */
         {
-            source: "/((?!_next/static|_next/image|favicon.ico).*)",
+            source: "/((?!_next/static|api|_next/image|favicon.ico).*)",
             missing: [
                 { type: "header", key: "next-router-prefetch" },
                 { type: "header", key: "purpose", value: "prefetch" },

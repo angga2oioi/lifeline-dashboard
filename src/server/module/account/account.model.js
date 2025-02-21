@@ -22,7 +22,7 @@ const AccountSchema = new mongoose.Schema(
             index: true,
         },
         roles: {
-            type: String,
+            type: [String],
             enum: {
                 values: [
                     MANAGE_ACCOUNT_ROLES,

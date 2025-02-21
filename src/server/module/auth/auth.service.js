@@ -1,6 +1,6 @@
 //@ts-check
 
-import { ACCOUNT_COOKIE_NAME, COOKIE_OPTIONS, INVALID_INPUT_ERR_CODE, MANAGE_ACCOUNT_ROLES, NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE, REFRESH_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_NAME } from "@/global/utils/constant";
+import { ACCOUNT_COOKIE_NAME, COOKIE_OPTIONS, CSRF_TOKEN_COOKIE_NAME, INVALID_INPUT_ERR_CODE, MANAGE_ACCOUNT_ROLES, NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE, REFRESH_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_NAME } from "@/global/utils/constant";
 import { HttpError } from "@/global/utils/functions";
 import jwt from "jsonwebtoken"
 import { Validator } from "node-input-validator";
@@ -14,12 +14,6 @@ export const createTokens = (account) => {
     return { accessToken, refreshToken };
 };
 
-export const setAuthCookies = (cookies, accessToken, refreshToken) => {
-    cookies.set(ACCOUNT_COOKIE_NAME, accessToken, COOKIE_OPTIONS);
-    cookies.set(REFRESH_TOKEN_COOKIE_NAME, refreshToken, REFRESH_COOKIE_OPTIONS);
-    return null
-};
-
 const handleCookieRenewal = (refreshToken) => {
     try {
         const decoded = jwt.verify(refreshToken, process?.env?.REFRESH_TOKEN_JWT_SECRET);
@@ -29,7 +23,7 @@ const handleCookieRenewal = (refreshToken) => {
 
         let account = jwt.verify(
             accessToken,
-            process?.env?.ACCOUNT_AUTHENTICATION_JWT_SECRET
+            process?.env?.ACCOUNT_TOKEN_JWT_SECRET
         );
 
         return { account, token: accessToken, refreshToken: newRefreshToken };
@@ -51,7 +45,7 @@ export const validateCookies = async (cookies) => {
 
         let account = jwt.verify(
             token,
-            process?.env?.ACCOUNT_AUTHENTICATION_JWT_SECRET
+            process?.env?.ACCOUNT_TOKEN_JWT_SECRET
         );
 
         return {
@@ -59,12 +53,14 @@ export const validateCookies = async (cookies) => {
             token,
         };
     } catch (e) {
+        
         if (refreshToken) {
             let { account, token, refreshToken: newRefreshToken } = handleCookieRenewal(refreshToken)
-            setAuthCookies(cookieStore, token, newRefreshToken);
+
             return {
                 account,
-                token
+                token,
+                refreshToken: newRefreshToken
             }
         }
 
@@ -114,4 +110,24 @@ export const isSetupNeeded = async () => {
     }
 
     return false
+}
+
+export const validateCSRFToken = async (cookies, headers) => {
+    let cookieStore = await cookies()
+    let headStore = await headers()
+
+    let csrfCookie = cookieStore.get(CSRF_TOKEN_COOKIE_NAME)?.value
+    let csrfHead = headStore.get("x-csrf-token")
+
+    if (!csrfCookie || !csrfHead) {
+        return false;
+    }
+
+    if (csrfCookie !== csrfHead) {
+        return false
+    }
+
+    let newToken = Buffer.from(crypto.randomUUID()).toString("base64");
+    cookieStore.set(CSRF_TOKEN_COOKIE_NAME, newToken, COOKIE_OPTIONS);
+    return true
 }

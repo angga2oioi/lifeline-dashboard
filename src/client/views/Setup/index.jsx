@@ -4,14 +4,18 @@ import FormLogin from "@/client/component/forms/FormLogin";
 import React from "react";
 import useErrorMessage from "@/client/hooks/useErrorMessage";
 import { accountLogin, setupAccount } from "@/client/api/auth";
-import { redirect } from "next/navigation";
+import { AppContext } from "@/client/context";
+import { useRouter } from "next/navigation";
 
 const SetupViews = ({ }) => {
-    const ErrorMessage = useErrorMessage()
+    const ErrorMessage = useErrorMessage();
+    const { csrf } = React.useContext(AppContext)
+    const router = useRouter()
+
     const handleSetup = async (form) => {
         try {
-            await setupAccount(form)
-            redirect(`/dashboard`)
+            await setupAccount(csrf, form)
+            router.push(`/dashboard`)
         } catch (e) {
             ErrorMessage(e)
         }

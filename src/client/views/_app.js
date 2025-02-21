@@ -9,17 +9,17 @@ import { ModalsProvider } from "@mantine/modals";
 import dynamic from "next/dynamic";
 const MantineProvider = dynamic(() => import("@mantine/core").then((n) => { return n.MantineProvider }), { ssr: false })
 
-const App = ({ children, nonce }) => {
+const App = ({ children, nonce, csrf }) => {
 
     return (
         <MantineProvider
             defaultColorScheme="light"
-            
+
         >
             <Notifications />
             <ModalsProvider>
                 <ContextMenuProvider>
-                    <AppContext.Provider value={{ nonce }}>
+                    <AppContext.Provider value={{ nonce, csrf }}>
                         {children}
                     </AppContext.Provider>
                 </ContextMenuProvider>
