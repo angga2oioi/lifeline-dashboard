@@ -1,7 +1,7 @@
 //@ts-check
 import { MANAGE_ACCOUNT_ROLES, MANAGE_PROJECT_ROLES } from "@/global/utils/constant";
 import mongoose from "../../utils/mongoose";
-import { toJSON, paginate } from "../../utils/mongoose/plugins";
+import { toJSON, paginate, aggregatePaginate } from "../../utils/mongoose/plugins";
 
 const { String } = mongoose.Schema.Types;
 
@@ -44,6 +44,7 @@ AccountSchema.index({ updatedAt: 1 });
 // add plugin that converts mongoose to json
 AccountSchema.plugin(toJSON);
 AccountSchema.plugin(paginate);
+AccountSchema.plugin(aggregatePaginate);
 
 export default mongoose.models.Account ||
     mongoose.model("Account", AccountSchema);

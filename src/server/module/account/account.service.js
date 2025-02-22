@@ -1,7 +1,7 @@
 //@ts-check
 
 import { INVALID_INPUT_ERR_CODE, MANAGE_ACCOUNT_ROLES, MANAGE_PROJECT_ROLES, NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE } from "@/global/utils/constant";
-import { HttpError, minMaxNum } from "@/global/utils/functions";
+import { HttpError, minMaxNum, parseSortBy } from "@/global/utils/functions";
 import { Validator } from "node-input-validator";
 import projectModel from "../project/project.model";
 import accountModel from "./account.model";
@@ -214,19 +214,80 @@ const buildAccountSearchQuery = (params) => {
 
 export const paginateAccount = async (query, sortBy = "createdAt:desc", limit = 10, page = 1) => {
 
-    let querySearch = buildAccountSearchQuery(query)
+    let queryParams = buildAccountSearchQuery(query)
     page = minMaxNum(page, 1)
     limit = minMaxNum(limit, 1, 50)
 
-    let list = await accountModel.paginate(querySearch, { sortBy, limit, page })
-    list.results = list?.results?.map((n) => {
-        let r = n?.toJSON()
-        delete r.password
-        return r
-    })
+    const sort = parseSortBy(sortBy)
 
-    return list
+    const aggregate = accountModel.aggregate([
+        {
+            $match: queryParams
+        },
+        {
+            $lookup: {
+                from: "projectaccounts",
+                localField: "_id",
+                foreignField: "account",
+                as: "projects"
+            }
+        },
+        {
+            $lookup: {
+                from: "projects",
+                localField: "projects.project",
+                foreignField: "_id",
+                as: "projectDetails"
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                username: 1,
+                roles: 1,
+                projects: {
+                    $map: {
+                        input: "$projectDetails",
+                        as: "project",
+                        in: {
+                            id: "$$project._id",
+                            title: "$$project.name"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            $sort: {
+                ...sort
+            }
+        }
+    ])
 
+    let options = { page, limit };
+
+    let res = await accountModel.aggregatePaginate(aggregate, options);
+
+    let list = {
+        results: res?.docs?.map((n) => {
+            return {
+                id: n?._id?.toString(),
+                username: n?.username,
+                roles: n?.roles,
+                projects: n?.projects?.map((n) => {
+                    return {
+                        id: n?.id?.toString(),
+                        name: n?.name
+                    }
+                }),
+            }
+        }),
+        page,
+        totalResults: res.total,
+        totalPages: res.pages,
+    };
+
+    return list;
 }
 
 export const findAccountById = async (id) => {

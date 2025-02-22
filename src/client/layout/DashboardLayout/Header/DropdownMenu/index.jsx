@@ -16,9 +16,11 @@ const DropdownMenu = ({ children, account }) => {
                 {
                     account?.roles?.includes(MANAGE_ACCOUNT_ROLES) &&
                     <>
-                        <Menu.Item leftSection={<FaUsers size={14} />}>
-                            Manage Users
-                        </Menu.Item>
+                        <Link href={`/dashboard/accounts`}>
+                            <Menu.Item leftSection={<FaUsers size={14} />}>
+                                Manage Users
+                            </Menu.Item>
+                        </Link>
                         <Menu.Divider />
                     </>
                 }

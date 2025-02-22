@@ -13,3 +13,12 @@ export const getMyStatuses = async (payload) => {
     return data.data
 
 }
+
+export const paginateAccount = async (params) => {
+
+    const { data } = await Axios.get(`/v1/accounts`, {
+        params
+    })
+    return data.data
+
+}

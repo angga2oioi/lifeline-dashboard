@@ -1,6 +1,6 @@
 //@ts-check
 import React from "react"
-const Header = () => {
+const TableHeader = () => {
     return (
         <>
             <div className="px-3 py-2 rounded-full w-full min-w-[640px] overflow-auto flex justify-between border">
@@ -14,4 +14,4 @@ const Header = () => {
     )
 }
 
-export default Header
+export default TableHeader

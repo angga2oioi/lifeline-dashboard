@@ -59,7 +59,7 @@ const decryptKey = (hash) => {
 export const createProject = async (params) => {
     const v = new Validator(params, {
         name: "required|string",
-        accounts: "require|string"
+        accounts: "require|arrayUnique"
     });
 
     let match = await v.check();
@@ -147,7 +147,7 @@ const buildProjectSearchQuery = (params) => {
     }
 }
 
-export const paginateProject = async (query, sortBy, limit, page) => {
+export const paginateProject = async (query, sortBy="createdAt:desc", limit=10, page=1) => {
     let {
         accountQuery,
         projectQuery
@@ -177,7 +177,6 @@ export const paginateProject = async (query, sortBy, limit, page) => {
                 _id: 1,
                 name: 1,
                 createdAt: 1,
-                accounts: 0
             }
         },
         {
