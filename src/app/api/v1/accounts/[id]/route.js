@@ -47,7 +47,9 @@ export async function DELETE(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        let data = await removeAccount(params?.id)
+        const { id } = await params
+
+        let data = await removeAccount(id)
 
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,
