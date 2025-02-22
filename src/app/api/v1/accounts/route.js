@@ -46,6 +46,7 @@ export async function GET(request, { params }) {
 export async function POST(request, { params }) {
     try {
 
+        const body = await request.json();
         const { account, token } = await validateCookies(cookies);
         if (!token) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE);
@@ -56,7 +57,7 @@ export async function POST(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        const body = await request.json();
+        
         let data = await createAccount(body)
 
         return NextResponse.json({
@@ -67,6 +68,7 @@ export async function POST(request, { params }) {
 
 
     } catch (e) {
+        console.log(e)
         return NextResponse.json(parseError(e), { status: e?.error || 400 });
     }
 }

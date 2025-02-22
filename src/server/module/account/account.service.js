@@ -48,7 +48,7 @@ export const setupAccount = async (params) => {
 export const createAccount = async (params) => {
     const v = new Validator(params, {
         username: "required|string",
-        roles: "required|arrayUnique",
+        roles: "arrayUnique",
         projects: "arrayUnique"
     });
 

@@ -22,3 +22,20 @@ export const paginateMyProject = async (params) => {
     return data.data
 
 }
+
+export const listAllMyProject = async () => {
+
+    let page = 1
+    let res = []
+    while (true) {
+        let list = await paginateMyProject({ page })
+        if (list?.results?.length < 1) {
+            break;
+        }
+
+        res = [...res, ...list?.results]
+        page += 1
+    }
+
+    return res
+}

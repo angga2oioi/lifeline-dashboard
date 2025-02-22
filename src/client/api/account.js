@@ -22,3 +22,17 @@ export const paginateAccount = async (params) => {
     return data.data
 
 }
+
+export const createAccount = async (payload) => {
+
+    const { data } = await Axios.post(`/v1/accounts`, payload)
+    return data.data
+
+}
+
+export const removeAccount = async (id) => {
+
+    const { data } = await Axios.delete(`/v1/accounts/${id}`)
+    return data.data
+
+}

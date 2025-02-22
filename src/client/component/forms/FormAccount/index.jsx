@@ -1,20 +1,22 @@
 //@ts-check
 import React from "react";
-import { TextInput } from "@mantine/core"
+import { MultiSelect, TextInput } from "@mantine/core"
 import { useForm } from '@mantine/form';
 import { PrimaryButton } from "../../buttons/PrimaryButton";
+import { MANAGE_ACCOUNT_ROLES, MANAGE_PROJECT_ROLES } from "@/global/utils/constant";
+import SelectProject from "../../selects/SelectProjects";
 
 
-const FormLogin = ({ onSubmit }) => {
+const FormAccount = ({ loading, onSubmit }) => {
     const form = useForm({
         mode: 'uncontrolled',
         initialValues: {
             username: '',
-            password: ""
+            roles: [],
+            projects: []
         },
         validate: {
-            username: (value) => value ? null : 'Username cannot empty',
-            password: (value) => value ? null : 'Password cannot empty'
+            username: (value) => value ? null : 'Username cannot empty'
         }
     });
 
@@ -30,16 +32,21 @@ const FormLogin = ({ onSubmit }) => {
                     key={form.key('username')}
                     {...form.getInputProps('username')}
                 />
-                <TextInput
-                    withAsterisk
-                    type="password"
-                    label="Password"
-                    key={form.key('password')}
-                    {...form.getInputProps('password')}
+                <MultiSelect
+                    label="Select roles"
+                    placeholder="Select Roles"
+                    data={[MANAGE_ACCOUNT_ROLES, MANAGE_PROJECT_ROLES]}
+                    {...form.getInputProps('roles')}
+                />
+                <SelectProject
+                    label="Select Projects"
+                    placeholder="Select Projects"
+                    {...form.getInputProps('projects')}
                 />
                 <div className="flex justify-end w-full">
                     <PrimaryButton
                         type="submit"
+                        disabled={loading}
                     >Submit</PrimaryButton>
                 </div>
             </form>
@@ -47,4 +54,4 @@ const FormLogin = ({ onSubmit }) => {
     )
 }
 
-export default FormLogin
+export default FormAccount
