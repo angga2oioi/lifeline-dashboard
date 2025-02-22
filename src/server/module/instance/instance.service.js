@@ -14,7 +14,7 @@ export const createInstance = async (params) => {
   const v = new Validator(params, {
     project: "require|string",
     serviceId: "require|string",
-    instanceId:"required|string"
+    instanceId: "required|string"
   });
 
   let match = await v.check();
@@ -98,6 +98,10 @@ const buildInstanceSearchQuery = (params) => {
     query.service = new ObjectId(params?.service?.toString())
   }
 
+  if (params?.instance) {
+    query._id = new ObjectId(params?.instance?.toString())
+  }
+
   return query
 }
 
@@ -139,13 +143,27 @@ export const listInstance = async (query) => {
                 { $sort: { createdAt: -1 } },
                 { $limit: 1 },
                 { $project: { lastBeatAt: "$createdAt" } }
+              ],
+              lastMinuteBeats: [
+                {
+                  $match: {
+                    createdAt: { $gte: new Date(Date.now() - 60 * 1000) } // Only last 1 minute
+                  }
+                },
+                {
+                  $group: {
+                    _id: null,
+                    beatsLastMinute: { $sum: 1 }
+                  }
+                }
               ]
             }
           },
           {
             $project: {
               beatsPerMinute: "$perMinute",
-              lastBeatAt: { $arrayElemAt: ["$lastBeat.lastBeatAt", 0] }
+              lastBeatAt: { $arrayElemAt: ["$lastBeat.lastBeatAt", 0] },
+              beatsLastMinute: { $ifNull: [{ $arrayElemAt: ["$lastMinuteBeats.beatsLastMinute", 0] }, 0] }
             }
           }
         ],
@@ -156,13 +174,30 @@ export const listInstance = async (query) => {
       $addFields: {
         beatsPerMinute: { $arrayElemAt: ["$beatData.beatsPerMinute", 0] },
         lastBeatAt: { $arrayElemAt: ["$beatData.lastBeatAt", 0] },
-        totalBeats: { $sum: { $map: { input: { $arrayElemAt: ["$beatData.beatsPerMinute", 0] }, as: "b", in: "$$b.beatCount" } } },
+        beatsLastMinute: { $arrayElemAt: ["$beatData.beatsLastMinute", 0] },
+        totalBeats: {
+          $sum: {
+            $map: {
+              input: { $arrayElemAt: ["$beatData.beatsPerMinute", 0] },
+              as: "b",
+              in: "$$b.beatCount"
+            }
+          }
+        },
         averageBeatsPerMinute: {
           $cond: [
             { $gt: [{ $size: { $arrayElemAt: ["$beatData.beatsPerMinute", 0] } }, 0] },
             {
               $divide: [
-                { $sum: { $map: { input: { $arrayElemAt: ["$beatData.beatsPerMinute", 0] }, as: "b", in: "$$b.beatCount" } } },
+                {
+                  $sum: {
+                    $map: {
+                      input: { $arrayElemAt: ["$beatData.beatsPerMinute", 0] },
+                      as: "b",
+                      in: "$$b.beatCount"
+                    }
+                  }
+                },
                 { $size: { $arrayElemAt: ["$beatData.beatsPerMinute", 0] } }
               ]
             },
@@ -180,10 +215,10 @@ export const listInstance = async (query) => {
         beatsPerMinute: 1,
         totalBeats: 1,
         averageBeatsPerMinute: 1,
-        lastBeatAt: 1
+        lastBeatAt: 1,
+        beatsLastMinute: 1 // NEW FIELD: Number of beats in the last minute
       }
     }
-
   ])
 
   return list?.map((n) => {
@@ -193,7 +228,8 @@ export const listInstance = async (query) => {
       createdAt: n?.instanceCreatedAt,
       bpm: n?.beatsPerMinute,
       avg: n?.averageBeatsPerMinute,
-      lastBeatAt: n?.lastBeatAt
+      lastBeatAt: n?.lastBeatAt,
+      lasMinuteBeat: n?.beatsLastMinute
     }
   })
 
