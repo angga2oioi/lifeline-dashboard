@@ -2,14 +2,17 @@
 "use client"
 import React from "react";
 import Header from "./Header";
+import Statistic from "./Statistic";
 
 const DashboardLayoutViews = ({ children }) => {
     return (
         <>
-            <div className="w-full h-full ">
+            <div className="w-full h-full space-y-3">
                 <Header />
-                
-                {children}
+                <Statistic />
+                <div className="px-3">
+                    {children}
+                </div>
             </div>
         </>
     )

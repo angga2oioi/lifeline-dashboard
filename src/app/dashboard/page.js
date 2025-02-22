@@ -1,12 +1,9 @@
 "use server"
 
-import DashboardViews from "@/client/views/Dashboard"
+import { redirect } from "next/navigation"
+
 
 export default async function DashboardPage() {
-
-    return (
-        <>
-            <DashboardViews />
-        </>
-    )
+    redirect(`/dashboard/projects`)
+    
 }

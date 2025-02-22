@@ -10,6 +10,7 @@ import Randomstring from "randomstring";
 import striptags from "striptags";
 import projectAccountModel from "../project/project.account.model";
 import mongoose from "mongoose";
+const { ObjectId } = mongoose.Types
 
 export const setupAccount = async (params) => {
     const v = new Validator(params, {
@@ -252,5 +253,103 @@ export const canIManage = async (id, role) => {
     }
 
     return false
+
+}
+
+export const getStatistic = async (id) => {
+
+    const result = await projectAccountModel.aggregate([
+        {
+            $match: {
+                account: new ObjectId(id)
+            }
+        },
+        {
+            $lookup: {
+                from: "services",
+                localField: "project",
+                foreignField: "project",
+                as: "services"
+            }
+        },
+        {
+            $lookup: {
+                from: "instances",
+                localField: "project",
+                foreignField: "project",
+                as: "instances"
+            }
+        },
+        {
+            $lookup: {
+                from: "events",
+                localField: "instances._id",
+                foreignField: "instance",
+                as: "events"
+            }
+        },
+        {
+            $group: {
+                _id: "$account",
+                totalProjects: { $addToSet: "$project" },
+                totalServices: { $push: "$services" },
+                totalInstances: { $push: "$instances" },
+                totalEvents: { $push: "$events" }
+            }
+        },
+        {
+            $project: {
+                accountId: "$_id",
+                totalProjects: {
+                    $ifNull: [{ $size: { $ifNull: ["$totalProjects", []] } }, 0]
+                },
+                totalServices: {
+                    $ifNull: [
+                        {
+                            $size: {
+                                $reduce: {
+                                    input: "$totalServices",
+                                    initialValue: [],
+                                    in: { $concatArrays: ["$$value", "$$this"] }
+                                }
+                            }
+                        },
+                        0
+                    ]
+                },
+                totalInstances: {
+                    $ifNull: [
+                        {
+                            $size: {
+                                $reduce: {
+                                    input: "$totalInstances",
+                                    initialValue: [],
+                                    in: { $concatArrays: ["$$value", "$$this"] }
+                                }
+                            }
+                        },
+                        0
+                    ]
+                },
+                totalEvents: {
+                    $ifNull: [
+                        {
+                            $size: {
+                                $reduce: {
+                                    input: "$totalEvents",
+                                    initialValue: [],
+                                    in: { $concatArrays: ["$$value", "$$this"] }
+                                }
+                            }
+                        },
+                        0
+                    ]
+                }
+            }
+        }
+    ])
+
+
+    return result
 
 }
