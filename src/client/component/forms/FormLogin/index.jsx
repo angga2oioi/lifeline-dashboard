@@ -27,6 +27,7 @@ const FormLogin = ({ onSubmit }) => {
                     {...form.getInputProps('username')}
                 />
                 <TextInput
+                    withAsterisk
                     type="password"
                     label="Password"
                     key={form.key('password')}

@@ -5,11 +5,8 @@ import { AppContext } from "../context";
 import { ContextMenuProvider } from "mantine-contextmenu";
 import { Notifications } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
-
-import dynamic from "next/dynamic";
-const MantineProvider = dynamic(() => import("@mantine/core").then((n) => { return n.MantineProvider }), { ssr: false })
-
-const App = ({ children, nonce, csrf }) => {
+import { MantineProvider } from "@mantine/core";
+const App = ({ children, nonce, csrf, account }) => {
 
     return (
         <MantineProvider
@@ -19,7 +16,7 @@ const App = ({ children, nonce, csrf }) => {
             <Notifications />
             <ModalsProvider>
                 <ContextMenuProvider>
-                    <AppContext.Provider value={{ nonce, csrf }}>
+                    <AppContext.Provider value={{ nonce, csrf, account }}>
                         {children}
                     </AppContext.Provider>
                 </ContextMenuProvider>
