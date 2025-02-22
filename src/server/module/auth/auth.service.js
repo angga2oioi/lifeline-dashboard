@@ -32,6 +32,13 @@ const handleCookieRenewal = (refreshToken) => {
     }
 }
 
+export const setAuthCookies = (cookieStore, accessToken, refreshToken) => {
+    // @ts-ignore
+    cookieStore.set(ACCOUNT_COOKIE_NAME, accessToken, COOKIE_OPTIONS);
+    // @ts-ignore
+    cookieStore.set(REFRESH_TOKEN_COOKIE_NAME, refreshToken, REFRESH_COOKIE_OPTIONS);
+}
+
 export const validateCookies = async (cookies) => {
     let cookieStore = await cookies()
 
@@ -51,12 +58,13 @@ export const validateCookies = async (cookies) => {
         return {
             account,
             token,
+            refreshToken
         };
     } catch (e) {
-        
+
         if (refreshToken) {
             let { account, token, refreshToken: newRefreshToken } = handleCookieRenewal(refreshToken)
-
+            setAuthCookies(cookieStore, token, newRefreshToken)
             return {
                 account,
                 token,
