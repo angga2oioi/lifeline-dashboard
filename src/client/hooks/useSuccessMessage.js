@@ -8,7 +8,7 @@ const useSuccessMessage = () => {
         showNotification({
             message: e,
             autoClose: 3000,
-            color: 'red',
+            color: 'green',
             withBorder: true,
             classNames: {
                 root: '!rounded-xl flex justify-center',
