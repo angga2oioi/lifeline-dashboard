@@ -21,8 +21,9 @@ export async function POST(request, { params }) {
         if (!canManage) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
+        const query = await params
 
-        const isMember = await amIAMember(account?.id, params?.id)
+        const isMember = await amIAMember(account?.id, query?.id)
         if (!isMember) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
@@ -31,7 +32,7 @@ export async function POST(request, { params }) {
 
         let data = await createService({
             ...body,
-            project: params?.id
+            project: query?.id
         })
 
         return NextResponse.json({
@@ -54,13 +55,15 @@ export async function GET(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE);
         }
 
-        const isMember = await amIAMember(account?.id, params?.id)
+        const query = await params
+
+        const isMember = await amIAMember(account?.id, query?.id)
         if (!isMember) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
 
-        let data = await listService({ project: params?.id })
+        let data = await listService({ project: query?.id })
 
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,

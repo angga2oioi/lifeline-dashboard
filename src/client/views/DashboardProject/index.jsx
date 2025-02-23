@@ -4,11 +4,11 @@ import React from "react"
 
 import { PrimaryButton } from "@/client/component/buttons/PrimaryButton"
 import useErrorMessage from "@/client/hooks/useErrorMessage"
-import { createProject, paginateMyProject } from "@/client/api/project"
+import {  paginateMyProject } from "@/client/api/project"
 import { ProjectTable } from "./ProjectTable"
 import { useSearchParams } from "next/navigation"
-import ModalCreateProject from "@/client/component/modals/ModalCreateProject"
 import SearchInput from "@/client/component/inputs/SearchInput"
+import ModalManageProject from "@/client/component/modals/ModalManageProject"
 const DashboardProjectViews = () => {
 
     const ErrorMessage = useErrorMessage()
@@ -50,7 +50,8 @@ const DashboardProjectViews = () => {
             </div>
             {
                 isCreateModalVisible &&
-                <ModalCreateProject
+                <ModalManageProject
+                    title={`Create Project`}
                     onCancel={() => {
                         setIsCreateModalVisible(false)
                     }}

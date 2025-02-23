@@ -14,8 +14,8 @@ import { DangerButton } from "@/client/component/buttons/DangerButton"
 import { FaPencilAlt, FaTrash } from "react-icons/fa"
 import { useConfirmDialog } from "@/client/hooks/useConfirmDialog"
 import { SecondaryButton } from "@/client/component/buttons/SecondaryButton"
-import ModalEditAccount from "@/client/component/modals/ModalEditAccount"
 import PaginationButtons from "@/client/component/buttons/PaginationButtons"
+import ModalManageAccount from "@/client/component/modals/ModalManageAccount"
 
 export const AccountTable = ({ list, onUpdate }) => {
 
@@ -95,7 +95,9 @@ export const AccountTable = ({ list, onUpdate }) => {
             }
             {
                 isEditModalVisible &&
-                <ModalEditAccount
+                <ModalManageAccount
+                    mode={"edit"}
+                    title={`Update Account`}
                     initialValue={formUpdate}
                     onSubmit={() => {
                         setIsEditModalVisible(false)

@@ -1,6 +1,6 @@
 //@ts-check
 
-import { MANAGE_PROJECT_ROLES, NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE, SUCCESS_ERR_CODE, SUCCESS_ERR_MESSAGE } from "@/global/utils/constant";
+import { MANAGE_PROJECT_ROLES, NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE, NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE, SUCCESS_ERR_CODE, SUCCESS_ERR_MESSAGE } from "@/global/utils/constant";
 import { HttpError, parseError } from "@/global/utils/functions";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
@@ -22,7 +22,9 @@ export async function DELETE(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        const service = await findServiceById(params?.id)
+        const query = await params
+
+        const service = await findServiceById(query?.id)
         if (!service) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
@@ -32,7 +34,7 @@ export async function DELETE(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        await removeService(params?.id)
+        await removeService(query?.id)
 
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,
@@ -53,12 +55,14 @@ export async function GET(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE);
         }
 
-        const service = await findServiceById(params?.id)
+        const query = await params
+
+        const service = await findServiceById(query?.id)
         if (!service) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        const isMember = await amIAMember(account?.id, service?.project?.id)
+        const isMember = await amIAMember(account?.id, service?.project)
         if (!isMember) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
@@ -82,10 +86,10 @@ export async function PUT(request, { params }) {
         if (!token) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE);
         }
-
-        const service = await findServiceById(params?.id)
+        const query = await params
+        const service = await findServiceById(query?.id)
         if (!service) {
-            throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
+            throw HttpError(NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE)
         }
 
         const isMember = await amIAMember(account?.id, service?.project?.toString())
@@ -105,6 +109,7 @@ export async function PUT(request, { params }) {
 
 
     } catch (e) {
+        console.log(e)
         return NextResponse.json(parseError(e), { status: e?.error || 400 });
     }
 }

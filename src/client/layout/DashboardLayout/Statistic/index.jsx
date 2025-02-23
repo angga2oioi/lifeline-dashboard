@@ -4,6 +4,7 @@ import { MdWorkOutline, MdMiscellaneousServices, MdStorage, MdEvent } from "reac
 import CardStatistic from "../../../component/cards/CardStatistic";
 import useErrorMessage from "@/client/hooks/useErrorMessage";
 import { getMyStatuses } from "@/client/api/account";
+import Link from "next/link";
 
 const Statistic = () => {
     const [status, setStatuses] = React.useState([])
@@ -24,7 +25,9 @@ const Statistic = () => {
     return (
         <>
             <div className="w-full grid grid-cols-2 gap-2 lg:grid-cols-4 px-3">
-                <CardStatistic icon={<MdWorkOutline size={20} className="text-[#7E3BEB]" />} title={`Project`} total={status?.totalProjects} />
+                <Link href={`/dashboard/projects`} className="cursor-pointer">
+                    <CardStatistic icon={<MdWorkOutline size={20} className="text-[#7E3BEB]" />} title={`Project`} total={status?.totalProjects} />
+                </Link>
                 <CardStatistic icon={<MdMiscellaneousServices size={20} className="text-[#7E3BEB]" />} title={`Service`} total={status?.totalServices} />
                 <CardStatistic icon={<MdStorage size={20} className="text-[#7E3BEB]" />} title={`Instance`} total={status?.totalInstances} />
                 <CardStatistic icon={<MdEvent size={20} className="text-[#7E3BEB]" />} title={`Events`} total={status?.totalEvents} />

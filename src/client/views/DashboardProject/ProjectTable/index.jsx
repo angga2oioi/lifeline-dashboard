@@ -1,8 +1,8 @@
 //@ts-check
 "use client"
-import React, { useCallback } from "react"
+import React from "react"
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { Badge, Pagination, Table } from "@mantine/core"
+import {   Table } from "@mantine/core"
 import useQueryString from "@/client/hooks/useQueryString"
 import { AppContext } from "@/client/context"
 import { SecondaryButton } from "@/client/component/buttons/SecondaryButton"
@@ -11,9 +11,10 @@ import { DangerButton } from "@/client/component/buttons/DangerButton"
 import { useConfirmDialog } from "@/client/hooks/useConfirmDialog"
 import useErrorMessage from "@/client/hooks/useErrorMessage"
 import { removeProject } from "@/client/api/project"
-import ModalEditProject from "@/client/component/modals/ModalEditProject"
 import Link from "next/link"
 import PaginationButtons from "@/client/component/buttons/PaginationButtons"
+import { MdOutlineFolderOff } from "react-icons/md"
+import ModalManageProject from "@/client/component/modals/ModalManageProject"
 
 export const ProjectTable = ({ list, onUpdate }) => {
 
@@ -53,33 +54,43 @@ export const ProjectTable = ({ list, onUpdate }) => {
     return (
         <>
 
+
             {
-                list?.results &&
-                <Table>
-                    <Table.Thead>
-                        <Table.Tr>
-                            <Table.Th>Name</Table.Th>
-                            <Table.Th>Services</Table.Th>
-                            <Table.Th>Instances</Table.Th>
-                            <Table.Th>Events</Table.Th>
-                        </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody >
-                        {
-                            list?.results?.map((n, i) => <TableRow
-                                key={n?.id}
-                                me={me}
-                                item={n}
-                                onRemoveClick={() => {
-                                    handleRemove(n?.id)
-                                }}
-                                onUpdateClick={() => {
-                                    handleUpdate(n)
-                                }}
-                            />)
-                        }
-                    </Table.Tbody>
-                </Table>
+                list?.results?.length > 0 ?
+                    <Table>
+                        <Table.Thead>
+                            <Table.Tr>
+                                <Table.Th>Name</Table.Th>
+                                <Table.Th>Services</Table.Th>
+                                <Table.Th>Instances</Table.Th>
+                                <Table.Th>Events</Table.Th>
+                            </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody >
+                            {
+                                list?.results?.map((n, i) => <TableRow
+                                    key={n?.id}
+                                    me={me}
+                                    item={n}
+                                    onRemoveClick={() => {
+                                        handleRemove(n?.id)
+                                    }}
+                                    onUpdateClick={() => {
+                                        handleUpdate(n)
+                                    }}
+                                />)
+                            }
+                        </Table.Tbody>
+                    </Table> :
+                    <>
+                        <div className="w-full px-3 py-4 flex justify-center h-[320px]">
+                            <div className="flex flex-col justify-center items-center">
+                                <div><MdOutlineFolderOff size={20} /></div>
+                                <div>No Data</div>
+                            </div>
+                        </div>
+
+                    </>
             }
             <ConfirmDialogComponent />
             {
@@ -93,8 +104,9 @@ export const ProjectTable = ({ list, onUpdate }) => {
             }
             {
                 isEditModalVisible &&
-                <ModalEditProject
+                <ModalManageProject
                     initialValue={formUpdate}
+                    title={`Update Project`}
                     onCancel={() => {
                         setIsEditModalVisible(false)
                     }}

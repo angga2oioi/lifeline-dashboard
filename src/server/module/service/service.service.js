@@ -15,7 +15,7 @@ const {
 export const createService = async (params) => {
     const v = new Validator(params, {
         name: "required|string",
-        project: "require|string"
+        project: "required|string"
     });
 
     let match = await v.check();

@@ -4,11 +4,11 @@ import React from "react"
 
 import { PrimaryButton } from "@/client/component/buttons/PrimaryButton"
 import { AccountTable } from "./AccountTable"
-import ModalCreateAccount from "@/client/component/modals/ModalCreateAccount"
 import { useRouter, useSearchParams } from "next/navigation"
 import { paginateAccount } from "@/client/api/account"
 import useErrorMessage from "@/client/hooks/useErrorMessage"
 import SearchInput from "@/client/component/inputs/SearchInput"
+import ModalManageAccount from "@/client/component/modals/ModalManageAccount"
 const DashboardAccountViews = () => {
     const [isCreateModalVisible, setIsCreateModalVisible] = React.useState(false)
     const searchParams = useSearchParams()
@@ -48,7 +48,8 @@ const DashboardAccountViews = () => {
 
             {
                 isCreateModalVisible &&
-                <ModalCreateAccount
+                <ModalManageAccount
+                    title={`Create Account`}
                     onCancel={() => {
                         setIsCreateModalVisible(false)
                     }}

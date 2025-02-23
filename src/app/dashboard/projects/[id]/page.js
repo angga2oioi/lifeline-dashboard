@@ -1,9 +1,11 @@
 "use server"
 
 import DashboardProjectDetailViews from "@/client/views/DashboardProjectDetail"
-export default async function DashboardProjectDetailPage() {
-    
+export default async function DashboardProjectDetailPage({ params }) {
+
+    const query = await params
+
     return (
-        <DashboardProjectDetailViews />
-    )    
+        <DashboardProjectDetailViews params={query} />
+    )
 }
