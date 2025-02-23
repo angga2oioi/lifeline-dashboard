@@ -12,6 +12,7 @@ import { useConfirmDialog } from "@/client/hooks/useConfirmDialog"
 import useErrorMessage from "@/client/hooks/useErrorMessage"
 import { removeProject } from "@/client/api/project"
 import ModalEditProject from "@/client/component/modals/ModalEditProject"
+import Link from "next/link"
 
 export const ProjectTable = ({ list, onUpdate }) => {
 
@@ -108,7 +109,11 @@ export const ProjectTable = ({ list, onUpdate }) => {
 const TableRow = ({ me, item, onRemoveClick, onUpdateClick }) => {
     return (
         <Table.Tr >
-            <Table.Td>{item.name}</Table.Td>
+            <Table.Td>
+                <Link href={`/dashboard/projects/${item?.id}`}>
+                    <span className="font-bold">{item.name}</span>
+                </Link>
+            </Table.Td>
             <Table.Td>{item.totalServices}</Table.Td>
             <Table.Td>{item.totalInstances}</Table.Td>
             <Table.Td>{item.totalEvents}</Table.Td>

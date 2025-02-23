@@ -12,7 +12,7 @@ const CardStatistic = ({ icon, title, total }) => {
             </div>
             <div className="flex justify-end">
                 <span className="text-[28px] font-[700]">
-                    {total}
+                    {total || 0}
                 </span>
             </div>
         </div>

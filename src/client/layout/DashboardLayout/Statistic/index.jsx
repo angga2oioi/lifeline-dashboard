@@ -24,10 +24,10 @@ const Statistic = () => {
     return (
         <>
             <div className="w-full grid grid-cols-2 gap-2 lg:grid-cols-4 px-3">
-                <CardStatistic icon={<MdWorkOutline size={20} className="text-[#7E3BEB]" />} title={`Project`} total={0} />
-                <CardStatistic icon={<MdMiscellaneousServices size={20} className="text-[#7E3BEB]" />} title={`Service`} total={0} />
-                <CardStatistic icon={<MdStorage size={20} className="text-[#7E3BEB]" />} title={`Instance`} total={0} />
-                <CardStatistic icon={<MdEvent size={20} className="text-[#7E3BEB]" />} title={`Events`} total={0} />
+                <CardStatistic icon={<MdWorkOutline size={20} className="text-[#7E3BEB]" />} title={`Project`} total={status?.totalProjects} />
+                <CardStatistic icon={<MdMiscellaneousServices size={20} className="text-[#7E3BEB]" />} title={`Service`} total={status?.totalServices} />
+                <CardStatistic icon={<MdStorage size={20} className="text-[#7E3BEB]" />} title={`Instance`} total={status?.totalInstances} />
+                <CardStatistic icon={<MdEvent size={20} className="text-[#7E3BEB]" />} title={`Events`} total={status?.totalEvents} />
             </div>
         </>
     )

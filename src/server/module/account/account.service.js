@@ -188,7 +188,7 @@ export const removeAccount = async (id) => {
 
     await accountModel.findByIdAndDelete(id)
     await projectAccountModel.deleteMany({
-        account:new ObjectId(id)
+        account: new ObjectId(id)
     })
 
     return null
@@ -414,6 +414,6 @@ export const getStatistic = async (id) => {
     ])
 
 
-    return result
+    return result?.[0] || null
 
 }
