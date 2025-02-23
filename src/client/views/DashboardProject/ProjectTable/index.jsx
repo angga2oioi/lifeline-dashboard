@@ -13,6 +13,7 @@ import useErrorMessage from "@/client/hooks/useErrorMessage"
 import { removeProject } from "@/client/api/project"
 import ModalEditProject from "@/client/component/modals/ModalEditProject"
 import Link from "next/link"
+import PaginationButtons from "@/client/component/buttons/PaginationButtons"
 
 export const ProjectTable = ({ list, onUpdate }) => {
 
@@ -84,9 +85,10 @@ export const ProjectTable = ({ list, onUpdate }) => {
             {
                 list?.totalResults > 0 &&
                 <div className="w-full flex justify-end">
-                    <Pagination total={list?.totalPages || 1} value={list?.page || 1} onChange={(e) => {
-                        router.push(pathname + '?' + createQueryString('page', e))
-                    }} />
+                    <PaginationButtons
+                        total={list?.totalPages || 1}
+                        value={list?.page || 1}
+                    />
                 </div>
             }
             {

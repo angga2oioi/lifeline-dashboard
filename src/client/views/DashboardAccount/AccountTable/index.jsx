@@ -15,6 +15,7 @@ import { FaPencilAlt, FaTrash } from "react-icons/fa"
 import { useConfirmDialog } from "@/client/hooks/useConfirmDialog"
 import { SecondaryButton } from "@/client/component/buttons/SecondaryButton"
 import ModalEditAccount from "@/client/component/modals/ModalEditAccount"
+import PaginationButtons from "@/client/component/buttons/PaginationButtons"
 
 export const AccountTable = ({ list, onUpdate }) => {
 
@@ -79,15 +80,17 @@ export const AccountTable = ({ list, onUpdate }) => {
                             />)
                         }
                     </Table.Tbody>
+                    
                 </Table>
             }
             <ConfirmDialogComponent />
             {
                 list?.totalResults > 0 &&
                 <div className="w-full flex justify-end">
-                    <Pagination total={list?.totalPages || 1} value={list?.page || 1} onChange={(e) => {
-                        router.push(pathname + '?' + createQueryString('page', e))
-                    }} />
+                    <PaginationButtons
+                        total={list?.totalPages || 1}
+                        value={list?.page || 1}
+                    />
                 </div>
             }
             {

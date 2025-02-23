@@ -8,6 +8,7 @@ import ModalCreateAccount from "@/client/component/modals/ModalCreateAccount"
 import { useRouter, useSearchParams } from "next/navigation"
 import { paginateAccount } from "@/client/api/account"
 import useErrorMessage from "@/client/hooks/useErrorMessage"
+import SearchInput from "@/client/component/inputs/SearchInput"
 const DashboardAccountViews = () => {
     const [isCreateModalVisible, setIsCreateModalVisible] = React.useState(false)
     const searchParams = useSearchParams()
@@ -34,7 +35,8 @@ const DashboardAccountViews = () => {
     return (
         <>
             <div className="w-full space-y-3">
-                <div className="flex justify-end">
+                <div className="flex justify-end space-x-2">
+                    <SearchInput />
                     <PrimaryButton onClick={() => {
                         setIsCreateModalVisible(true)
                     }}>

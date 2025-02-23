@@ -203,7 +203,7 @@ const buildProjectSearchQuery = (params) => {
     let accountQuery = {}
     if (params?.search) {
         projectQuery.$or = [
-            { title: { $regex: params?.search, $options: "i" } }, // Filter by project title (case-insensitive)
+            { name: { $regex: params?.search, $options: "i" } }, // Filter by project title (case-insensitive)
         ]
     }
 

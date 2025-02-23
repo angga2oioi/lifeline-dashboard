@@ -8,6 +8,7 @@ import { createProject, paginateMyProject } from "@/client/api/project"
 import { ProjectTable } from "./ProjectTable"
 import { useSearchParams } from "next/navigation"
 import ModalCreateProject from "@/client/component/modals/ModalCreateProject"
+import SearchInput from "@/client/component/inputs/SearchInput"
 const DashboardProjectViews = () => {
 
     const ErrorMessage = useErrorMessage()
@@ -35,9 +36,10 @@ const DashboardProjectViews = () => {
     return (
         <>
             <div className="w-full space-y-3">
-                <div className="flex justify-end">
+                <div className="flex justify-end space-x-2">
+                    <SearchInput />
                     <PrimaryButton
-                        onClick={()=>{
+                        onClick={() => {
                             setIsCreateModalVisible(true)
                         }}
                     >
@@ -47,12 +49,12 @@ const DashboardProjectViews = () => {
                 <ProjectTable list={list} onUpdate={fetchData} />
             </div>
             {
-                isCreateModalVisible && 
-                <ModalCreateProject 
-                    onCancel={()=>{
+                isCreateModalVisible &&
+                <ModalCreateProject
+                    onCancel={() => {
                         setIsCreateModalVisible(false)
                     }}
-                    onSubmit={()=>{
+                    onSubmit={() => {
                         fetchData()
                         setIsCreateModalVisible(false)
                     }}
