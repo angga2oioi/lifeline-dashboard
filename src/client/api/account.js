@@ -30,6 +30,13 @@ export const createAccount = async (payload) => {
 
 }
 
+export const updateAccount = async (id, payload) => {
+
+    const { data } = await Axios.put(`/v1/accounts/${id}`, payload)
+    return data.data
+
+}
+
 export const removeAccount = async (id) => {
 
     const { data } = await Axios.delete(`/v1/accounts/${id}`)

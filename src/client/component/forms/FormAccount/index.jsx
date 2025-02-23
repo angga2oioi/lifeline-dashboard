@@ -7,13 +7,13 @@ import { MANAGE_ACCOUNT_ROLES, MANAGE_PROJECT_ROLES } from "@/global/utils/const
 import SelectProject from "../../selects/SelectProjects";
 
 
-const FormAccount = ({ loading, onSubmit }) => {
+const FormAccount = ({ initialValue = null, loading, onSubmit }) => {
     const form = useForm({
         mode: 'uncontrolled',
         initialValues: {
-            username: '',
-            roles: [],
-            projects: []
+            username: initialValue?.username || "",
+            roles: initialValue?.roles || [],
+            projects: initialValue?.projects || []
         },
         validate: {
             username: (value) => value ? null : 'Username cannot empty'
@@ -30,6 +30,7 @@ const FormAccount = ({ loading, onSubmit }) => {
                     withAsterisk
                     label="Username"
                     key={form.key('username')}
+                    disabled={initialValue !== null}
                     {...form.getInputProps('username')}
                 />
                 <MultiSelect

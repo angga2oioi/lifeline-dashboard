@@ -41,7 +41,7 @@ const DashboardAccountViews = () => {
                         Create Account
                     </PrimaryButton>
                 </div>
-                <AccountTable list={list} fetchData={fetchData}/>
+                <AccountTable list={list} onUpdate={fetchData}/>
             </div>
 
             {
