@@ -4,11 +4,12 @@ import React from "react"
 
 import { PrimaryButton } from "@/client/component/buttons/PrimaryButton"
 import useErrorMessage from "@/client/hooks/useErrorMessage"
-import {  paginateMyProject } from "@/client/api/project"
+import { paginateMyProject } from "@/client/api/project"
 import { ProjectTable } from "./ProjectTable"
 import { useSearchParams } from "next/navigation"
 import SearchInput from "@/client/component/inputs/SearchInput"
 import ModalManageProject from "@/client/component/modals/ModalManageProject"
+import ModalShowSecret from "@/client/component/modals/ModalShowSecret"
 const DashboardProjectViews = () => {
 
     const ErrorMessage = useErrorMessage()
@@ -16,6 +17,8 @@ const DashboardProjectViews = () => {
 
     const [list, setList] = React.useState({})
     const [isCreateModalVisible, setIsCreateModalVisible] = React.useState(false)
+    const [isSecretModalVisible, setIsSecretModalVisible] = React.useState(false)
+    const [secreteKey, setSecretKey] = React.useState({})
 
     const fetchData = async () => {
         try {
@@ -55,9 +58,20 @@ const DashboardProjectViews = () => {
                     onCancel={() => {
                         setIsCreateModalVisible(false)
                     }}
-                    onSubmit={() => {
+                    onSubmit={(e) => {
                         fetchData()
                         setIsCreateModalVisible(false)
+                        setSecretKey(e)
+                        setIsSecretModalVisible(true)
+                    }}
+                />
+            }
+            {
+                isSecretModalVisible && 
+                <ModalShowSecret 
+                    secretKey={secreteKey}
+                    onClose={()=>{
+                        setIsSecretModalVisible(false)
                     }}
                 />
             }

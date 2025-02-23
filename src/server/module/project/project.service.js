@@ -456,6 +456,9 @@ export const removeProject = async (id) => {
 
 export const validateProjectSignature = async (headers, body = {}, query = {}) => {
     const { projectid, timestamp, signature } = headers;
+    if (!projectid || !timestamp || !signature) {
+        throw HttpError(NO_ACCESS_ERR_CODE, `Missing headers`);
+    }
 
     const project = await projectModel.findById(projectid)
     if (!project) {
@@ -465,8 +468,12 @@ export const validateProjectSignature = async (headers, body = {}, query = {}) =
     const { secretKey } = decryptKey(project?.credential)
 
     let nowTime = new Date().getTime();
-
-    let timeDiff = Math.abs(nowTime - num2Int(timestamp));
+    const parsedTimestamp = num2Int(timestamp);
+    if (parsedTimestamp > nowTime) {
+        throw HttpError(NO_ACCESS_ERR_CODE, `Time travelling is currently impossible`);
+    }
+    
+    let timeDiff = Math.abs(nowTime - parsedTimestamp);
     if (timeDiff > 5 * 60 * 1000) {
         throw HttpError(NO_ACCESS_ERR_CODE, `Request expired`);
     }
@@ -479,7 +486,7 @@ export const validateProjectSignature = async (headers, body = {}, query = {}) =
     const Hash = params + num2Int(timestamp);
 
     const Signature = crypto
-        .createHmac(`SHA256`, secretKey)
+        .createHmac(`sha256`, secretKey)
         .update(Hash)
         .digest("hex")
         .toUpperCase();

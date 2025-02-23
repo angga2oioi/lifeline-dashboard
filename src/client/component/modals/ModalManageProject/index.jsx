@@ -16,8 +16,8 @@ const ModalManageProject = ({ mode = "create", title, initialValue = null, onCan
 
         try {
             setIsSubmitting(true)
-            await createProject(e)
-            onSubmit()
+            let { secret } = await createProject(e)
+            onSubmit(secret)
         } catch (e) {
             ErrorMessage(e)
         } finally {
