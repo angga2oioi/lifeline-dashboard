@@ -14,6 +14,20 @@ export const createProject = async (payload) => {
 
 }
 
+export const updateProject = async (id, payload) => {
+
+    const { data } = await Axios.put(`/v1/projects/${id}`, payload)
+    return data.data
+
+}
+
+export const removeProject = async (id) => {
+
+    const { data } = await Axios.delete(`/v1/projects/${id}`)
+    return data.data
+
+}
+
 export const paginateMyProject = async (params) => {
 
     const { data } = await Axios.get(`/v1/accounts/me/projects`, {

@@ -2,12 +2,12 @@
 import mongoose from "../../utils/mongoose";
 import { toJSON, paginate,aggregatePaginate } from "../../utils/mongoose/plugins";
 
-const { String, Mixed } = mongoose.Schema.Types;
+const { String, ObjectId } = mongoose.Schema.Types;
 
 const EventSchema = new mongoose.Schema(
     {
         instance: {
-            type: Mixed,
+            type: ObjectId,
             required: true,
         },
         title: {

@@ -1,42 +1,85 @@
 //@ts-check
 "use client"
 import React, { useCallback } from "react"
-import TableHeader from "./TableHeader"
-import useErrorMessage from "@/client/hooks/useErrorMessage"
-import { paginateMyProject } from "@/client/api/project"
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { Pagination } from "@mantine/core"
+import { Badge, Pagination, Table } from "@mantine/core"
 import useQueryString from "@/client/hooks/useQueryString"
+import { AppContext } from "@/client/context"
+import { SecondaryButton } from "@/client/component/buttons/SecondaryButton"
+import { FaPencilAlt, FaTrash } from "react-icons/fa"
+import { DangerButton } from "@/client/component/buttons/DangerButton"
+import { useConfirmDialog } from "@/client/hooks/useConfirmDialog"
+import useErrorMessage from "@/client/hooks/useErrorMessage"
+import { removeProject } from "@/client/api/project"
+import ModalEditProject from "@/client/component/modals/ModalEditProject"
 
-export const ProjectTable = () => {
+export const ProjectTable = ({ list, onUpdate }) => {
 
-    const ErrorMessage = useErrorMessage()
     const searchParams = useSearchParams()
     const router = useRouter()
     const pathname = usePathname()
     const { createQueryString } = useQueryString(searchParams)
+    const { account: me } = React.useContext(AppContext)
+    const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog();
+    const ErrorMessage = useErrorMessage()
+    const [formUpdate, setFormUpdate] = React.useState(null)
+    const [isEditModalVisible, setIsEditModalVisible] = React.useState(false)
 
-    const [list, setList] = React.useState({})
-    const fetchData = async () => {
-        try {
-            const query = Object.fromEntries(searchParams.entries())
-
-            let l = await paginateMyProject(query)
-            setList(l)
-
-        } catch (e) {
-            ErrorMessage(e)
-        }
+    const handleRemove = async (id) => {
+        openConfirmDialog({
+            title: 'Remove Account',
+            message: 'Are you sure you want to remove this project? This action cannot be undone.',
+            confirmLabel: 'Delete',
+            cancelLabel: 'Cancel',
+            onConfirm: async () => {
+                try {
+                    await removeProject(id)
+                    onUpdate()
+                } catch (e) {
+                    ErrorMessage(e)
+                }
+            },
+            onCancel: () => console.log('Delete cancelled'),
+        })
     }
 
-    React.useEffect(() => {
-        fetchData()
-    }, [searchParams])
+    const handleUpdate = async (item) => {
+        setFormUpdate(item)
+        setIsEditModalVisible(true)
+    }
 
     return (
         <>
-            <TableHeader />
 
+            {
+                list?.results &&
+                <Table>
+                    <Table.Thead>
+                        <Table.Tr>
+                            <Table.Th>Name</Table.Th>
+                            <Table.Th>Services</Table.Th>
+                            <Table.Th>Instances</Table.Th>
+                            <Table.Th>Events</Table.Th>
+                        </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody >
+                        {
+                            list?.results?.map((n, i) => <TableRow
+                                key={n?.id}
+                                me={me}
+                                item={n}
+                                onRemoveClick={() => {
+                                    handleRemove(n?.id)
+                                }}
+                                onUpdateClick={() => {
+                                    handleUpdate(n)
+                                }}
+                            />)
+                        }
+                    </Table.Tbody>
+                </Table>
+            }
+            <ConfirmDialogComponent />
             {
                 list?.totalResults > 0 &&
                 <div className="w-full flex justify-end">
@@ -45,6 +88,43 @@ export const ProjectTable = () => {
                     }} />
                 </div>
             }
+            {
+                isEditModalVisible &&
+                <ModalEditProject
+                    initialValue={formUpdate}
+                    onCancel={() => {
+                        setIsEditModalVisible(false)
+                    }}
+                    onSubmit={() => {
+                        setIsEditModalVisible(false)
+                        onUpdate()
+                    }}
+                />
+            }
         </>
+    )
+}
+
+const TableRow = ({ me, item, onRemoveClick, onUpdateClick }) => {
+    return (
+        <Table.Tr >
+            <Table.Td>{item.name}</Table.Td>
+            <Table.Td>{item.totalServices}</Table.Td>
+            <Table.Td>{item.totalInstances}</Table.Td>
+            <Table.Td>{item.totalEvents}</Table.Td>
+            <Table.Td className="flex justify-end space-x-2">
+                {
+                    item?.id !== me?.id &&
+                    <>
+                        <SecondaryButton onClick={onUpdateClick}>
+                            <FaPencilAlt />
+                        </SecondaryButton>
+                        <DangerButton onClick={onRemoveClick}>
+                            <FaTrash />
+                        </DangerButton>
+                    </>
+                }
+            </Table.Td>
+        </Table.Tr>
     )
 }

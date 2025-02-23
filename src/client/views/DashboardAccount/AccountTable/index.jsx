@@ -26,7 +26,7 @@ export const AccountTable = ({ list, onUpdate }) => {
     const { account: me } = React.useContext(AppContext)
     const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog();
     const [formUpdate, setFormUpdate] = React.useState(null)
-    const [isEditModalVisible,setIsEditModalVisible] = React.useState(false)
+    const [isEditModalVisible, setIsEditModalVisible] = React.useState(false)
 
     const handleRemove = async (id) => {
         openConfirmDialog({
@@ -66,23 +66,17 @@ export const AccountTable = ({ list, onUpdate }) => {
                     </Table.Thead>
                     <Table.Tbody >
                         {
-                            list?.results?.map((n, i) => {
-                                return (
-                                    <>
-                                        <TableRow
-                                            key={i}
-                                            me={me}
-                                            item={n}
-                                            onRemoveClick={() => {
-                                                handleRemove(n?.id)
-                                            }}
-                                            onUpdateClick={() => {
-                                                handleUpdate(n)
-                                            }}
-                                        />
-                                    </>
-                                )
-                            })
+                            list?.results?.map((n, i) => <TableRow
+                                key={i}
+                                me={me}
+                                item={n}
+                                onRemoveClick={() => {
+                                    handleRemove(n?.id)
+                                }}
+                                onUpdateClick={() => {
+                                    handleUpdate(n)
+                                }}
+                            />)
                         }
                     </Table.Tbody>
                 </Table>
@@ -97,14 +91,14 @@ export const AccountTable = ({ list, onUpdate }) => {
                 </div>
             }
             {
-                isEditModalVisible && 
-                <ModalEditAccount 
+                isEditModalVisible &&
+                <ModalEditAccount
                     initialValue={formUpdate}
-                    onSubmit={()=>{
+                    onSubmit={() => {
                         setIsEditModalVisible(false)
                         onUpdate()
                     }}
-                    onCancel={()=>{
+                    onCancel={() => {
                         setIsEditModalVisible(false)
                     }}
                 />
@@ -112,6 +106,8 @@ export const AccountTable = ({ list, onUpdate }) => {
         </>
     )
 }
+
+
 
 const TableRow = ({ me, item, onRemoveClick, onUpdateClick }) => {
     return (
@@ -124,7 +120,7 @@ const TableRow = ({ me, item, onRemoveClick, onUpdateClick }) => {
             </Table.Td>
             <Table.Td className="space-x-2">
                 {item?.projects?.map((m, k) => {
-                    return <Badge key={k}>{m}</Badge>
+                    return <Badge key={k}>{m?.name}</Badge>
                 })}
             </Table.Td>
             <Table.Td className="flex justify-end space-x-2">

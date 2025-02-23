@@ -23,6 +23,23 @@ export const paginateAccount = async (params) => {
 
 }
 
+export const listAllAccount = async () => {
+
+    let page = 1
+    let res = []
+    while (true) {
+        let list = await paginateAccount({ page })
+        if (list?.results?.length < 1) {
+            break;
+        }
+
+        res = [...res, ...list?.results]
+        page += 1
+    }
+
+    return res
+}
+
 export const createAccount = async (payload) => {
 
     const { data } = await Axios.post(`/v1/accounts`, payload)

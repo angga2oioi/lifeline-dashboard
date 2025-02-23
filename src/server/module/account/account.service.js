@@ -89,7 +89,7 @@ export const createAccount = async (params) => {
                     account: account?.[0]?._id,
                     project: n?._id
                 }
-            }), { session })
+            }), { ordered: true, session })
 
         }
 
@@ -187,6 +187,9 @@ export const removeAccount = async (id) => {
     }
 
     await accountModel.findByIdAndDelete(id)
+    await projectAccountModel.deleteMany({
+        account:new ObjectId(id)
+    })
 
     return null
 }
@@ -251,7 +254,7 @@ export const paginateAccount = async (query, sortBy = "createdAt:desc", limit = 
                         as: "project",
                         in: {
                             id: "$$project._id",
-                            title: "$$project.name"
+                            name: "$$project.name"
                         }
                     }
                 }

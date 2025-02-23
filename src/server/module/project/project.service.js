@@ -11,7 +11,11 @@ import projectAccountModel from "./project.account.model"
 import mongoose from "mongoose"
 const algorithm = "aes-256-ctr";
 const secretKey = process?.env?.CRYPTO_SECRET;
-
+import Randomstring from "randomstring"
+import serviceModel from "../service/service.model"
+import instanceModel from "../instance/instance.model"
+import instanceBeatModel from "../instance/instance.beat.model"
+import eventModel from "../event/event.model"
 const {
     ObjectId
 } = mongoose.Types
@@ -59,7 +63,7 @@ const decryptKey = (hash) => {
 export const createProject = async (params) => {
     const v = new Validator(params, {
         name: "required|string",
-        accounts: "require|arrayUnique"
+        accounts: "required|arrayUnique"
     });
 
     let match = await v.check();
@@ -87,7 +91,7 @@ export const createProject = async (params) => {
 
         let project = await projectModel.create([
             {
-                username: striptags(params?.username),
+                name: striptags(params?.name),
                 credential
             }
         ], { session })
@@ -98,7 +102,7 @@ export const createProject = async (params) => {
                     account: n._id,
                     project: project?.[0]?._id
                 }
-            }), { session })
+            }), { ordered: true, session })
 
         }
 
@@ -111,6 +115,8 @@ export const createProject = async (params) => {
     } catch (e) {
         await session.abortTransaction();
         throw e;
+    } finally {
+        session.endSession();
     }
 
 }
@@ -125,6 +131,70 @@ export const findProjectById = async (id) => {
     const r = raw?.toJSON()
     delete r.credential
     return r
+
+}
+
+export const updateProject = async (id, params) => {
+    const project = await projectModel.findById(id)
+    if (!project) {
+        throw HttpError(NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE)
+    }
+
+    const v = new Validator(params, {
+        name: "required|string",
+        accounts: "required|arrayUnique"
+    });
+
+    let match = await v.check();
+    if (!match) {
+        throw HttpError(INVALID_INPUT_ERR_CODE, v.errors);
+    }
+
+    let accounts = []
+
+    if (params?.accounts?.length > 0) {
+        accounts = (await Promise.all(params?.accounts?.map((n) => {
+            return accountModel.findById(n)
+        })))?.filter((n) => {
+            return n !== null
+        })
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+
+        await projectModel.findByIdAndUpdate(id, {
+            $set: {
+                name: striptags(params?.name),
+            }
+        }, { session })
+
+        if (accounts?.length > 0) {
+            await projectAccountModel.deleteMany({
+                project: new ObjectId(id)
+            }, { session })
+
+            await projectAccountModel.create(accounts?.map((n) => {
+                return {
+                    account: n._id,
+                    project: new ObjectId(id)
+                }
+            }), { ordered: true, session })
+
+        }
+
+        await session.commitTransaction()
+        return null
+
+    } catch (e) {
+        await session.abortTransaction();
+        throw e;
+    } finally {
+        session.endSession();
+    }
+
 
 }
 
@@ -147,7 +217,7 @@ const buildProjectSearchQuery = (params) => {
     }
 }
 
-export const paginateProject = async (query, sortBy="createdAt:desc", limit=10, page=1) => {
+export const paginateProject = async (query, sortBy = "createdAt:desc", limit = 10, page = 1) => {
     let {
         accountQuery,
         projectQuery
@@ -173,10 +243,88 @@ export const paginateProject = async (query, sortBy="createdAt:desc", limit=10, 
             $match: accountQuery
         },
         {
+            $lookup: {
+                from: "accounts",
+                localField: "accounts.account",
+                foreignField: "_id",
+                as: "accountDetails"
+            }
+        },
+        {
             $project: {
                 _id: 1,
                 name: 1,
                 createdAt: 1,
+                accounts: {
+                    $map: {
+                        input: "$accountDetails",
+                        as: "account",
+                        in: {
+                            id: "$$account._id",
+                            username: "$$account.username"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            $lookup: {
+                from: "services",
+                localField: "_id",
+                foreignField: "project",
+                as: "services"
+            }
+        },
+        {
+            $lookup: {
+                from: "instances",
+                localField: "_id",
+                foreignField: "project",
+                as: "instances"
+            }
+        },
+        {
+            $unwind: {
+                path: "$instances",
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $lookup: {
+                from: "events",
+                localField: "instances._id",
+                foreignField: "instance",
+                as: "events"
+            }
+        },
+        {
+            $group: {
+                _id: "$_id",
+                name: { $first: "$name" },
+                accounts: { $first: "$accounts" },
+                services: { $first: "$services" },
+                instances: { $push: "$instances" },
+                events: { $push: "$events" },
+                createdAt: { $first: "$createdAt" }
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                name: 1,
+                accounts: 1,
+                totalServices: { $size: "$services" },
+                totalInstances: { $size: "$instances" },
+                totalEvents: {
+                    $size: {
+                        $reduce: {
+                            input: "$events",
+                            initialValue: [],
+                            in: { $concatArrays: ["$$value", "$$this"] }
+                        }
+                    }
+                },
+                createdAt: 1
             }
         },
         {
@@ -195,6 +343,10 @@ export const paginateProject = async (query, sortBy="createdAt:desc", limit=10, 
             return {
                 id: n?._id?.toString(),
                 name: n?.name,
+                accounts: n?.accounts,
+                totalServices: n?.totalServices,
+                totalInstances: n?.totalInstances,
+                totalEvents: n?.totalEvents,
                 createdAt: n?.createdAt,
             }
         }),
@@ -269,6 +421,33 @@ export const removeProject = async (id) => {
     await projectModel.findByIdAndDelete(id)
     await projectAccountModel.deleteMany({
         project: raw?._id
+    })
+    await serviceModel.deleteMany({
+        project: raw?._id
+    })
+
+    let instances = await instanceModel.find({
+        project: raw?._id
+    })
+
+    await instanceModel.deleteMany({
+        project: raw?._id
+    })
+
+    await instanceBeatModel.deleteMany({
+        instance: {
+            $in: instances?.map((n) => {
+                return n?._id
+            })
+        }
+    })
+
+    await eventModel.deleteMany({
+        instance: {
+            $in: instances?.map((n) => {
+                return n?._id
+            })
+        }
     })
 
     return null

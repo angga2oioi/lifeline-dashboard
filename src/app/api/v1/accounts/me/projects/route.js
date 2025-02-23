@@ -5,7 +5,7 @@ import { HttpError, parseError } from "@/global/utils/functions";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { validateCookies } from "@/server/module/auth/auth.service";
-import { createProject,  paginateProject } from "@/server/module/project/project.service";
+import { createProject, paginateProject } from "@/server/module/project/project.service";
 import { canIManage } from "@/server/module/account/account.service";
 
 export async function GET(request, { params }) {
@@ -56,12 +56,10 @@ export async function POST(request, { params }) {
         }
 
         const body = await request.json();
+        let accounts = Array.from(new Set([...(body?.accounts || []), account?.id]))
         let data = await createProject({
             ...body,
-            accounts: [
-                ...(body?.accounts || []),
-                account?.id
-            ]
+            accounts
         })
 
         return NextResponse.json({
@@ -72,6 +70,7 @@ export async function POST(request, { params }) {
 
 
     } catch (e) {
+
         return NextResponse.json(parseError(e), { status: e?.error || 400 });
     }
 }

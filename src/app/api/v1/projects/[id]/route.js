@@ -6,7 +6,44 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { validateCookies } from "@/server/module/auth/auth.service";
 import { canIManage } from "@/server/module/account/account.service";
-import {  amIAMember, findProjectById, removeProject } from "@/server/module/project/project.service";
+import { amIAMember, findProjectById, removeProject, updateProject } from "@/server/module/project/project.service";
+
+export async function PUT(request, { params }) {
+    try {
+
+        const { account, token } = await validateCookies(cookies);
+        if (!token) {
+            throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE);
+        }
+
+        const canManage = await canIManage(account?.id, MANAGE_PROJECT_ROLES)
+        if (!canManage) {
+            throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
+        }
+
+        const isMember = await amIAMember(account?.id, params?.id)
+        if (!isMember) {
+            throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
+        }
+
+        const body = await request.json();
+        let accounts = Array.from(new Set([...(body?.accounts || []), account?.id]))
+        await updateProject(params?.id, {
+            ...body,
+            accounts
+        })
+
+        return NextResponse.json({
+            error: SUCCESS_ERR_CODE,
+            message: SUCCESS_ERR_MESSAGE,
+        });
+
+
+    } catch (e) {
+        return NextResponse.json(parseError(e), { status: e?.error || 400 });
+    }
+}
+
 
 export async function DELETE(request, { params }) {
     try {
