@@ -12,8 +12,8 @@ const { ObjectId } = mongoose.Types
 
 export const createInstance = async (params) => {
   const v = new Validator(params, {
-    project: "require|string",
-    serviceId: "require|string",
+    project: "required|string",
+    serviceId: "required|string",
     instanceId: "required|string"
   });
 

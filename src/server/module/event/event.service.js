@@ -16,8 +16,8 @@ export const createEvent = async (params) => {
         project: "required|string",
         instanceId: "required|string",
         serviceId: "required|string",
-        title: "require|string",
-        message: "require|string"
+        title: "required|string",
+        message: "required|string"
     });
 
     let match = await v.check();

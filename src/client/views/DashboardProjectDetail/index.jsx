@@ -53,7 +53,7 @@ const DashboardProjectDetailViews = ({ params }) => {
                     initialValue={{
                         project: params?.id
                     }}
-                    
+                    title={`Create Service`}
                     onCancel={() => {
                         setIsCreateModalVisible(false)
                     }}

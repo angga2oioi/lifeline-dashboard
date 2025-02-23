@@ -5,6 +5,7 @@ import { SecondaryButton } from "@/client/component/buttons/SecondaryButton";
 import ModalManageService from "@/client/component/modals/ModalManageService";
 import { useConfirmDialog } from "@/client/hooks/useConfirmDialog"
 import useErrorMessage from "@/client/hooks/useErrorMessage"
+import { Tooltip } from "@mantine/core";
 import React from "react"
 import { FaPencilAlt, FaTrash } from "react-icons/fa";
 import { MdOutlineFolderOff } from "react-icons/md";
@@ -92,12 +93,16 @@ const ServiceItem = ({ item, onRemoveClick, onUpdateClick }) => {
             <div className="w-full flex justify-between">
                 <div className="text-lg">{item?.name}</div>
                 <div className="flex justify-end space-x-2">
-                    <SecondaryButton onClick={onUpdateClick}>
-                        <FaPencilAlt />
-                    </SecondaryButton>
-                    <DangerButton onClick={onRemoveClick}>
-                        <FaTrash />
-                    </DangerButton>
+                    <Tooltip label={`Update Service`}>
+                        <SecondaryButton onClick={onUpdateClick}>
+                            <FaPencilAlt />
+                        </SecondaryButton>
+                    </Tooltip>
+                    <Tooltip label={`Remove Account`}>
+                        <DangerButton onClick={onRemoveClick}>
+                            <FaTrash />
+                        </DangerButton>
+                    </Tooltip>
                 </div>
             </div>
         </div>

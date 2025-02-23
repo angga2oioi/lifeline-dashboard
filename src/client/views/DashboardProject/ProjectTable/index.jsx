@@ -2,11 +2,11 @@
 "use client"
 import React from "react"
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import {   Table } from "@mantine/core"
+import { Table, Tooltip } from "@mantine/core"
 import useQueryString from "@/client/hooks/useQueryString"
 import { AppContext } from "@/client/context"
 import { SecondaryButton } from "@/client/component/buttons/SecondaryButton"
-import { FaPencilAlt, FaTrash } from "react-icons/fa"
+import { FaFileDownload, FaPencilAlt, FaTrash } from "react-icons/fa"
 import { DangerButton } from "@/client/component/buttons/DangerButton"
 import { useConfirmDialog } from "@/client/hooks/useConfirmDialog"
 import useErrorMessage from "@/client/hooks/useErrorMessage"
@@ -15,16 +15,17 @@ import Link from "next/link"
 import PaginationButtons from "@/client/component/buttons/PaginationButtons"
 import { MdOutlineFolderOff } from "react-icons/md"
 import ModalManageProject from "@/client/component/modals/ModalManageProject"
+import { listProjectServices } from "@/client/api/service"
+import useSuccessMessage from "@/client/hooks/useSuccessMessage"
 
 export const ProjectTable = ({ list, onUpdate }) => {
 
-    const searchParams = useSearchParams()
-    const router = useRouter()
-    const pathname = usePathname()
-    const { createQueryString } = useQueryString(searchParams)
+
     const { account: me } = React.useContext(AppContext)
     const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog();
     const ErrorMessage = useErrorMessage()
+    const SuccessMessage = useSuccessMessage()
+
     const [formUpdate, setFormUpdate] = React.useState(null)
     const [isEditModalVisible, setIsEditModalVisible] = React.useState(false)
 
@@ -49,6 +50,24 @@ export const ProjectTable = ({ list, onUpdate }) => {
     const handleUpdate = async (item) => {
         setFormUpdate(item)
         setIsEditModalVisible(true)
+    }
+
+    const handleDownload = async (id) => {
+        try {
+
+            let services = await listProjectServices(id)
+            let env = [
+                `LIFELINE_PROJECT_ID=${id}`,
+                ...services?.map((n) => {
+                    return `${n?.name?.replace(/[^a-zA-Z0-9]/g, '_').toUpperCase()}_LIFELINE_SERVICE=${n?.id}`
+                })]?.join("\n")
+
+            await navigator.clipboard.writeText(env)
+            
+            SuccessMessage('Text copied to clipboard')
+        } catch (e) {
+            ErrorMessage(e)
+        }
     }
 
     return (
@@ -77,6 +96,9 @@ export const ProjectTable = ({ list, onUpdate }) => {
                                     }}
                                     onUpdateClick={() => {
                                         handleUpdate(n)
+                                    }}
+                                    onDownloadClick={() => {
+                                        handleDownload(n?.id)
                                     }}
                                 />)
                             }
@@ -120,7 +142,7 @@ export const ProjectTable = ({ list, onUpdate }) => {
     )
 }
 
-const TableRow = ({ me, item, onRemoveClick, onUpdateClick }) => {
+const TableRow = ({ me, item, onRemoveClick, onUpdateClick, onDownloadClick }) => {
     return (
         <Table.Tr >
             <Table.Td>
@@ -135,12 +157,21 @@ const TableRow = ({ me, item, onRemoveClick, onUpdateClick }) => {
                 {
                     item?.id !== me?.id &&
                     <>
-                        <SecondaryButton onClick={onUpdateClick}>
-                            <FaPencilAlt />
-                        </SecondaryButton>
-                        <DangerButton onClick={onRemoveClick}>
-                            <FaTrash />
-                        </DangerButton>
+                        <Tooltip label={`Download env`}>
+                            <SecondaryButton onClick={onDownloadClick}>
+                                <FaFileDownload />
+                            </SecondaryButton>
+                        </Tooltip>
+                        <Tooltip label={`Edit Project`}>
+                            <SecondaryButton onClick={onUpdateClick}>
+                                <FaPencilAlt />
+                            </SecondaryButton>
+                        </Tooltip>
+                        <Tooltip label={`Delete Project`}>
+                            <DangerButton onClick={onRemoveClick}>
+                                <FaTrash />
+                            </DangerButton>
+                        </Tooltip>
                     </>
                 }
             </Table.Td>

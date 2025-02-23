@@ -9,7 +9,8 @@ import { createInstance, registerBeat } from "@/server/module/instance/instance.
 export async function POST(request, { params }) {
     try {
 
-        const headers = request.headers;
+        const headers = Object.fromEntries(request.headers);
+        
         const { searchParams } = new URL(request.nextUrl);
         const query = Object.fromEntries(searchParams.entries())
         const body = await request.json();
@@ -29,6 +30,7 @@ export async function POST(request, { params }) {
 
 
     } catch (e) {
+        console.log(e)
         return NextResponse.json(parseError(e), { status: e?.error || 400 });
     }
 }

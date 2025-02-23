@@ -5,7 +5,7 @@ import React from "react"
 import useErrorMessage from "@/client/hooks/useErrorMessage"
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { Badge, Pagination } from "@mantine/core"
+import { Badge, Pagination, Tooltip } from "@mantine/core"
 import useQueryString from "@/client/hooks/useQueryString"
 import { paginateAccount, removeAccount } from "@/client/api/account"
 import { Table } from '@mantine/core';
@@ -80,7 +80,7 @@ export const AccountTable = ({ list, onUpdate }) => {
                             />)
                         }
                     </Table.Tbody>
-                    
+
                 </Table>
             }
             <ConfirmDialogComponent />
@@ -132,12 +132,16 @@ const TableRow = ({ me, item, onRemoveClick, onUpdateClick }) => {
                 {
                     item?.id !== me?.id &&
                     <>
-                        <SecondaryButton onClick={onUpdateClick}>
-                            <FaPencilAlt />
-                        </SecondaryButton>
-                        <DangerButton onClick={onRemoveClick}>
-                            <FaTrash />
-                        </DangerButton>
+                        <Tooltip label={`Edit Account`}>
+                            <SecondaryButton onClick={onUpdateClick}>
+                                <FaPencilAlt />
+                            </SecondaryButton>
+                        </Tooltip>
+                        <Tooltip label={`Remove Account`}>
+                            <DangerButton onClick={onRemoveClick}>
+                                <FaTrash />
+                            </DangerButton>
+                        </Tooltip>
                     </>
                 }
             </Table.Td>
