@@ -93,3 +93,7 @@ export const createSlug = (string) => {
         .replace(/[^\w-]+/g, "")
         .replace(/-{2,}/g, "-");
 };
+
+export const delay = (ms)=>{
+    return new Promise(resolve => setTimeout(resolve, ms));
+}

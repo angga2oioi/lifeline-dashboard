@@ -29,7 +29,7 @@ export async function POST(request, { params }) {
 
 
     } catch (e) {
-        console.log(e)
+        
         return NextResponse.json(parseError(e), { status: e?.error || 400 });
     }
 }

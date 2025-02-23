@@ -1,4 +1,5 @@
 //@ts-check
+import { listServiceInstances } from "@/client/api/instances";
 import { removeService } from "@/client/api/service"
 import { DangerButton } from "@/client/component/buttons/DangerButton";
 import { SecondaryButton } from "@/client/component/buttons/SecondaryButton";
@@ -9,6 +10,7 @@ import { Tooltip } from "@mantine/core";
 import React from "react"
 import { FaPencilAlt, FaTrash } from "react-icons/fa";
 import { MdOutlineFolderOff } from "react-icons/md";
+import InstanceList from "../InstanceList";
 
 const ServiceList = ({ list, onUpdate }) => {
     const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog();
@@ -88,6 +90,21 @@ const ServiceList = ({ list, onUpdate }) => {
 
 const ServiceItem = ({ item, onRemoveClick, onUpdateClick }) => {
 
+    const [list, setList] = React.useState([])
+
+    const fetchInstances = async () => {
+        try {
+            let l = await listServiceInstances(item?.id)
+            setList(l)
+        } catch (e) {
+
+        }
+    }
+
+    React.useEffect(() => {
+        fetchInstances()
+    }, [])
+
     return (
         <div className="border border-gray-200 rounded-xl w-full px-3 py-4 space-y-2">
             <div className="w-full flex justify-between">
@@ -105,6 +122,9 @@ const ServiceItem = ({ item, onRemoveClick, onUpdateClick }) => {
                     </Tooltip>
                 </div>
             </div>
+            <InstanceList 
+                list={list}
+            />
         </div>
     )
 }

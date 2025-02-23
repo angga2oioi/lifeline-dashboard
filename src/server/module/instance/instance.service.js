@@ -1,7 +1,7 @@
 //@ts-check
 
 import { INVALID_INPUT_ERR_CODE, NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE } from "@/global/utils/constant";
-import { createSlug, HttpError } from "@/global/utils/functions";
+import { createSlug, HttpError, num2Int } from "@/global/utils/functions";
 import { Validator } from "node-input-validator";
 import projectModel from "../project/project.model";
 import serviceModel from "../service/service.model";
@@ -107,6 +107,21 @@ const buildInstanceSearchQuery = (params) => {
 
 export const listInstance = async (query) => {
   const queryParams = buildInstanceSearchQuery(query)
+  let list = await instanceModel.find(queryParams)
+
+  return list?.map((n) => {
+    return {
+      id: n?.id,
+      slug: n?.slug,
+      project: n?.project?.toString(),
+      service: n?.service?.toString(),
+      createdAt: n?.createdAt,
+    }
+  })
+}
+
+export const getInstanceStatuses = async (instance) => {
+  const queryParams = buildInstanceSearchQuery({ instance })
 
   const list = await instanceModel.aggregate([
     {
@@ -226,11 +241,16 @@ export const listInstance = async (query) => {
       id: n?.instanceId?.toString(),
       slug: n?.instanceSlug,
       createdAt: n?.instanceCreatedAt,
-      bpm: n?.beatsPerMinute,
-      avg: n?.averageBeatsPerMinute,
+      bpm: n?.beatsPerMinute?.map((n) => {
+        return {
+          time: n?._id,
+          beats: n?.beatCount
+        }
+      }),
+      avg: num2Int(n?.averageBeatsPerMinute),
       lastBeatAt: n?.lastBeatAt,
       lasMinuteBeat: n?.beatsLastMinute
     }
-  })
+  })?.[0]
 
 }

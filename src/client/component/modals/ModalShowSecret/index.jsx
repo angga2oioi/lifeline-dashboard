@@ -4,7 +4,7 @@ import React from "react"
 const ModalShowSecret = ({ onClose, secretKey }) => {
     return (
         <>
-            <Modal opened={true} onClose={onClose}>
+            <Modal opened={true} onClose={onClose} title={`Project Secret Key`}>
                 <div>Here is your secret Key.
                     You will not be able to view this key again once you close this window,
                     so be sure to store it somewhere save.

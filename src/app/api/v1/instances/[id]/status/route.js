@@ -6,8 +6,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { validateCookies } from "@/server/module/auth/auth.service";
 import { amIAMember } from "@/server/module/project/project.service";
-import { findInstanceById, listInstance, } from "@/server/module/instance/instance.service";
-import { paginateEvent } from "@/server/module/event/event.service";
+import { findInstanceById, getInstanceStatuses, listInstance, } from "@/server/module/instance/instance.service";
 
 export async function GET(request, { params }) {
     try {
@@ -17,7 +16,9 @@ export async function GET(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE);
         }
 
-        const instance = await findInstanceById(params?.id)
+        const query = await params
+
+        const instance = await findInstanceById(query?.id)
         if (!instance) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
@@ -27,14 +28,12 @@ export async function GET(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-
-
-        let data = await listInstance({ instance: params?.id })
+        let data = await getInstanceStatuses(query?.id)
 
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,
             message: SUCCESS_ERR_MESSAGE,
-            data: data?.[0]
+            data
         });
 
 
