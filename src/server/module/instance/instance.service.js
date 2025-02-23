@@ -135,7 +135,7 @@ export const getInstanceStatuses = async (instance) => {
           {
             $match: {
               $expr: { $eq: ["$instance", "$$instanceId"] },
-              createdAt: { $gte: new Date(Date.now() - 60 * 60 * 1000) } // Only last 1 hour
+              createdAt: { $gte: new Date(Date.now() - 60 * 60 * 1000) } // Last 1 hour
             }
           },
           {
@@ -162,7 +162,7 @@ export const getInstanceStatuses = async (instance) => {
               lastMinuteBeats: [
                 {
                   $match: {
-                    createdAt: { $gte: new Date(Date.now() - 60 * 1000) } // Only last 1 minute
+                    createdAt: { $gte: new Date(Date.now() - 60 * 1000) } // Last 1 minute
                   }
                 },
                 {
@@ -183,6 +183,24 @@ export const getInstanceStatuses = async (instance) => {
           }
         ],
         as: "beatData"
+      }
+    },
+    
+    {
+      $lookup: {
+        from: "events",
+        let: { instanceId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$instance", "$$instanceId"] }
+            }
+          },
+          {
+            $count: "totalEvents"
+          }
+        ],
+        as: "eventData"
       }
     },
     {
@@ -218,7 +236,8 @@ export const getInstanceStatuses = async (instance) => {
             },
             0
           ]
-        }
+        },
+        totalEvents: { $ifNull: [{ $arrayElemAt: ["$eventData.totalEvents", 0] }, 0] }
       }
     },
     {
@@ -231,10 +250,12 @@ export const getInstanceStatuses = async (instance) => {
         totalBeats: 1,
         averageBeatsPerMinute: 1,
         lastBeatAt: 1,
-        beatsLastMinute: 1 // NEW FIELD: Number of beats in the last minute
+        beatsLastMinute: 1,
+        totalEvents: 1 // 🎉 NEW FIELD: Total event count for the instance
       }
     }
-  ])
+  ]
+  )
 
   return list?.map((n) => {
     return {
@@ -249,7 +270,8 @@ export const getInstanceStatuses = async (instance) => {
       }),
       avg: num2Int(n?.averageBeatsPerMinute),
       lastBeatAt: n?.lastBeatAt,
-      lasMinuteBeat: n?.beatsLastMinute
+      lasMinuteBeat: n?.beatsLastMinute,
+      totalEvents: n?.totalEvents
     }
   })?.[0]
 

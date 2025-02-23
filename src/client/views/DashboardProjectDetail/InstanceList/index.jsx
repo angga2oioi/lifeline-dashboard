@@ -66,15 +66,19 @@ const InstanceItem = ({ item }) => {
                 <div className="flex justify-end space-x-2">
                     <div className="flex flex-col">
                         <span className="text-xs">Started</span>
-                        <span>{moment(new Date(item?.createdAt)).fromNow()}</span>
+                        <span className="text-center">{moment(new Date(item?.createdAt)).fromNow()}</span>
                     </div>
                     <div className="flex flex-col ">
-                        <span className="text-xs">Average</span>
-                        <span>{status?.avg}/min</span>
+                        <span className="text-xs">Average Beats</span>
+                        <span className="text-center">{status?.avg}/min</span>
                     </div>
                     <div className="flex flex-col ">
-                        <span className="text-xs">Last Beat</span>
-                        <span>{status?.lastBeatAt ? moment(new Date(status?.lastBeatAt)).fromNow() : ""}</span>
+                        <span className="text-xs">Last Beat At</span>
+                        <span className="text-center">{status?.lastBeatAt ? moment(new Date(status?.lastBeatAt)).fromNow() : ""}</span>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-xs">Total Events</span>
+                        <span className="text-center">{status?.totalEvents}</span>
                     </div>
                     <div className="flex flex-col ">
                         <span className="text-xs">Status</span>
