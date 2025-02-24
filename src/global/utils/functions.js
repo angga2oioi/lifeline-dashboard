@@ -29,7 +29,7 @@ export const HttpError = (error, message) => {
 export const parseError = (e) => {
     return {
         error: e.error || UNKNOWN_ERR_CODE,
-        message: e?.response?.data?.message || e.message || UNKNOWN_ERR_MESSAGE,
+        message: e?.stack || e?.response?.data?.message || e.message || UNKNOWN_ERR_MESSAGE,
     };
 };
 
