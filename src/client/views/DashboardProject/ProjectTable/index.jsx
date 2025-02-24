@@ -56,14 +56,17 @@ export const ProjectTable = ({ list, onUpdate }) => {
         try {
 
             let services = await listProjectServices(id)
+            const { hostname, protocol } = window.location
+
             let env = [
+                `LIFELINE_BASE_URL=${protocol}//${hostname}/api`,
                 `LIFELINE_PROJECT_ID=${id}`,
                 ...services?.map((n) => {
                     return `${n?.name?.replace(/[^a-zA-Z0-9]/g, '_').toUpperCase()}_LIFELINE_SERVICE=${n?.id}`
                 })]?.join("\n")
 
             await navigator.clipboard.writeText(env)
-            
+
             SuccessMessage('Text copied to clipboard')
         } catch (e) {
             ErrorMessage(e)

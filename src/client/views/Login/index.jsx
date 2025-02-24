@@ -15,7 +15,7 @@ const LoginViews = ({ }) => {
     const handleLogin = async (form) => {
         try {
             await accountLogin(csrf, form)
-            router.replace(`/dashboard`)
+            window.location.href = `/dashboard`
         } catch (e) {
             ErrorMessage(e)
         }
