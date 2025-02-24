@@ -60,7 +60,7 @@ const DashboardInstanceDetailViews = ({ params }) => {
                             <Table.Tbody >
                                 {
                                     list?.results?.map((n, i) => <TableRow
-                                        key={n?.id}
+                                        key={`title-${i}`}
                                         item={n}
                                     />)
                                 }
@@ -96,21 +96,22 @@ const TableRow = ({ item, }) => {
         <Table.Tr >
             <Table.Td>
                 <span className="font-bold">{item.title}</span>
-                <MessageList messages={item?.messages} />
+                <MessageList title={item?.title} messages={item?.messages} />
             </Table.Td>
         </Table.Tr>
     )
 }
 
-const MessageList = ({ messages }) => {
+const MessageList = ({ title, messages }) => {
     return (
         <>
-            {messages?.map((n) => <div className="w-full mt-2 px-3 py-2 border-t bg-gray-200 rounded-xl">
+            {messages?.map((n, i) => <div key={`message-${title}-${i}`} className="w-full mt-2 px-3 py-2 border-t bg-gray-200 rounded-xl">
                 <div>
                     {n?.message}
                 </div>
-                <div className="w-full flex justify-end">
-                    <span>{moment(new Date(n?.createdAt)).fromNow()}</span>
+                <div className="w-full flex justify-end space-x-2">
+                    <span>Total: {n?.total}</span>
+                    <span>Last Message At: {moment(new Date(n?.lastCreatedAt)).fromNow()}</span>
                 </div>
             </div>)}
         </>

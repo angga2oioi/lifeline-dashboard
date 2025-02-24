@@ -77,11 +77,19 @@ export const paginateEvent = async (query, sortBy = "createdAt:desc", limit = 10
         },
         {
             $group: {
-                _id: "$title",
+                _id: { title: "$title", message: "$message" },
+                count: { $sum: 1 },
+                lastCreatedAt: { $max: "$createdAt" }
+            }
+        },
+        {
+            $group: {
+                _id: "$_id.title",
                 messages: {
                     $push: {
-                        message: "$message",
-                        createdAt: "$createdAt"
+                        message: "$_id.message",
+                        total: "$count",
+                        lastCreatedAt: "$lastCreatedAt"
                     }
                 }
             }
