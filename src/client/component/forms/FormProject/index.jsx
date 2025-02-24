@@ -4,9 +4,13 @@ import { TextInput } from "@mantine/core"
 import { useForm } from '@mantine/form';
 import { PrimaryButton } from "../../buttons/PrimaryButton";
 import SelectAccounts from "../../selects/SelectAccounts";
+import { AppContext } from "@/client/context";
+import { MANAGE_ACCOUNT_ROLES } from "@/global/utils/constant";
 
 
 const FormProject = ({ initialValue = null, loading, onSubmit }) => {
+    const { account: me } = React.useContext(AppContext)
+
     const form = useForm({
         mode: 'uncontrolled',
         initialValues: {
@@ -30,12 +34,15 @@ const FormProject = ({ initialValue = null, loading, onSubmit }) => {
                     key={form.key('name')}
                     {...form.getInputProps('name')}
                 />
+                {
+                    me?.roles?.includes(MANAGE_ACCOUNT_ROLES) &&
+                    <SelectAccounts
+                        label="Select Accounts"
+                        placeholder="Select Accounts"
+                        {...form.getInputProps('accounts')}
+                    />
+                }
 
-                <SelectAccounts
-                    label="Select Accounts"
-                    placeholder="Select Accounts"
-                    {...form.getInputProps('accounts')}
-                />
                 <div className="flex justify-end w-full">
                     <PrimaryButton
                         type="submit"

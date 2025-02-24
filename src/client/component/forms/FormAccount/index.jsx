@@ -5,9 +5,12 @@ import { useForm } from '@mantine/form';
 import { PrimaryButton } from "../../buttons/PrimaryButton";
 import { MANAGE_ACCOUNT_ROLES, MANAGE_PROJECT_ROLES } from "@/global/utils/constant";
 import SelectProject from "../../selects/SelectProjects";
+import { AppContext } from "@/client/context";
 
 
 const FormAccount = ({ initialValue = null, loading, onSubmit }) => {
+    const { account: me } = React.useContext(AppContext)
+
     const form = useForm({
         mode: 'uncontrolled',
         initialValues: {
@@ -39,11 +42,13 @@ const FormAccount = ({ initialValue = null, loading, onSubmit }) => {
                     data={[MANAGE_ACCOUNT_ROLES, MANAGE_PROJECT_ROLES]}
                     {...form.getInputProps('roles')}
                 />
-                <SelectProject
-                    label="Select Projects"
-                    placeholder="Select Projects"
-                    {...form.getInputProps('projects')}
-                />
+                {me?.roles?.includes(MANAGE_PROJECT_ROLES) &&
+                    <SelectProject
+                        label="Select Projects"
+                        placeholder="Select Projects"
+                        {...form.getInputProps('projects')}
+                    />
+                }
                 <div className="flex justify-end w-full">
                     <PrimaryButton
                         type="submit"

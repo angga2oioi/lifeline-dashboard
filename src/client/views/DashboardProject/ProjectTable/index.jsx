@@ -130,6 +130,7 @@ export const ProjectTable = ({ list, onUpdate }) => {
             {
                 isEditModalVisible &&
                 <ModalManageProject
+                    mode={`edit`}
                     initialValue={formUpdate}
                     title={`Update Project`}
                     onCancel={() => {

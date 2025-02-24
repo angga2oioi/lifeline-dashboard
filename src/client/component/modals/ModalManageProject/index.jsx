@@ -8,7 +8,7 @@ const ModalManageProject = ({ mode = "create", title, initialValue = null, onCan
 
     const ErrorMessage = useErrorMessage()
     const [isSubmitting, setIsSubmitting] = React.useState(false)
-
+    
     const handleCreateProject = async (e) => {
         if (isSubmitting) {
             return null
@@ -54,6 +54,7 @@ const ModalManageProject = ({ mode = "create", title, initialValue = null, onCan
         <>
             <Modal opened={true} onClose={onCancel} title={title}>
                 <FormProject
+                    initialValue={initialValue}
                     loading={isSubmitting}
                     onSubmit={handleSubmit}
                 />
