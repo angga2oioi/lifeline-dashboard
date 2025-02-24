@@ -30,7 +30,7 @@ const EventSchema = new mongoose.Schema(
 
 EventSchema.index(
     { createdAt: 1 },
-    { expireAfterSeconds: 3 * 60 * 60 }
+    { expireAfterSeconds: 60 * 60 }
 );
 EventSchema.index({ updatedAt: 1 });
 

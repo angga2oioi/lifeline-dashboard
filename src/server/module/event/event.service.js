@@ -1,7 +1,7 @@
 //@ts-check
 
 import { INVALID_INPUT_ERR_CODE, NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE } from "@/global/utils/constant";
-import { createSlug, HttpError, minMaxNum } from "@/global/utils/functions";
+import { createSlug, HttpError, minMaxNum, parseSortBy } from "@/global/utils/functions";
 import { Validator } from "node-input-validator";
 import instanceModel from "../instance/instance.model";
 import striptags from "striptags";
@@ -30,7 +30,7 @@ export const createEvent = async (params) => {
         slug: createSlug(params?.instanceId),
         service: new ObjectId(params?.serviceId)
     })
-    
+
     if (!instance) {
         throw HttpError(NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE)
     }
@@ -69,11 +69,52 @@ export const paginateEvent = async (query, sortBy = "createdAt:desc", limit = 10
     let queryParams = buildEventSearchQuery(query)
     page = minMaxNum(page, 1)
     limit = minMaxNum(limit, 1, 50)
+    const sort = parseSortBy(sortBy)
 
-    let list = await eventModel.paginate(queryParams, { sortBy, limit, page })
-    list.results = list?.results?.map((n) => {
-        return n?.toJSON()
-    })
+    const aggregate = eventModel.aggregate([
+        {
+            $match: queryParams,
+        },
+        {
+            $group: {
+                _id: "$title",
+                messages: {
+                    $push: {
+                        message: "$message",
+                        createdAt: "$createdAt"
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                title: "$_id",
+                messages: 1
+            }
+        },
+        {
+            $sort: {
+                ...sort
+            }
+        }
+    ])
+    let options = { page, limit };
+
+    let res = await eventModel.aggregatePaginate(aggregate, options);
+
+    let list = {
+        results: res?.docs?.map((n) => {
+            return {
+                id: n?._id?.toString(),
+                title: n?.title,
+                messages: n?.messages,
+            }
+        }),
+        page,
+        totalResults: res.total,
+        totalPages: res.pages,
+    };
 
     return list
 }

@@ -1,10 +1,12 @@
 //@ts-check
+"use client"
 import React from "react"
 import { MdOutlineFolderOff } from "react-icons/md"
 import moment from "moment-timezone"
 import useErrorMessage from "@/client/hooks/useErrorMessage"
 import { getInstanceStatus } from "@/client/api/instances"
 import { delay } from "@/global/utils/functions"
+import Link from "next/link"
 
 const InstanceList = ({ list }) => {
 
@@ -42,7 +44,7 @@ const InstanceItem = ({ item }) => {
             if (status !== null) {
                 await delay(30000)
             }
-            
+
             let s = await getInstanceStatus(item?.id)
             setStatus(s)
         } catch (e) {
@@ -60,7 +62,9 @@ const InstanceItem = ({ item }) => {
                 <div>
                     <div className="flex flex-col">
                         <span className="text-xs">ID</span>
-                        <span>{item?.slug}</span>
+                        <Link href={`/dashboard/instances/${item?.id}`}>
+                            <span>{item?.slug}</span>
+                        </Link>
                     </div>
                 </div>
                 <div className="flex justify-end space-x-2">
