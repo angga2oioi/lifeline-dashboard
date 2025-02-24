@@ -47,6 +47,13 @@ export const createAccount = async (payload) => {
 
 }
 
+export const changeMyPassword = async (payload) => {
+
+    const { data } = await Axios.patch(`/v1/accounts/me/password`, payload)
+    return data.data
+
+}
+
 export const updateAccount = async (id, payload) => {
 
     const { data } = await Axios.put(`/v1/accounts/${id}`, payload)

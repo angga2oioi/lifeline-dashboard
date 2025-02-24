@@ -9,7 +9,6 @@ const SelectAccounts = ({ ...props }) => {
 
     const ErrorMessage = useErrorMessage()
     const [list, setList] = React.useState([])
-    const { account: me } = React.useContext(AppContext)
 
     const fetchData = async () => {
         try {

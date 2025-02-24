@@ -15,8 +15,8 @@ const FormAccount = ({ initialValue = null, loading, onSubmit }) => {
         mode: 'uncontrolled',
         initialValues: {
             username: initialValue?.username || "",
-            roles: initialValue?.roles || [],
-            projects: initialValue?.projects || []
+            roles: [],
+            projects: []
         },
         validate: {
             username: (value) => value ? null : 'Username cannot empty'
@@ -29,6 +29,7 @@ const FormAccount = ({ initialValue = null, loading, onSubmit }) => {
                 className="w-full space-y-2"
                 onSubmit={form.onSubmit(onSubmit)}
             >
+
                 <TextInput
                     withAsterisk
                     label="Username"
