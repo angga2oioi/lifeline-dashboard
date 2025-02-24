@@ -7,7 +7,7 @@ import useErrorMessage from "@/client/hooks/useErrorMessage"
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Badge, Pagination, Tooltip } from "@mantine/core"
 import useQueryString from "@/client/hooks/useQueryString"
-import { paginateAccount, removeAccount } from "@/client/api/account"
+import { paginateAccount, removeAccount, resetAccountPassword } from "@/client/api/account"
 import { Table } from '@mantine/core';
 import { AppContext } from "@/client/context"
 import { DangerButton } from "@/client/component/buttons/DangerButton"
@@ -16,6 +16,8 @@ import { useConfirmDialog } from "@/client/hooks/useConfirmDialog"
 import { SecondaryButton } from "@/client/component/buttons/SecondaryButton"
 import PaginationButtons from "@/client/component/buttons/PaginationButtons"
 import ModalManageAccount from "@/client/component/modals/ModalManageAccount"
+import { IoReloadOutline } from "react-icons/io5";
+import ModalShowPassword from "@/client/component/modals/ModalShowPassword"
 
 export const AccountTable = ({ list, onUpdate }) => {
 
@@ -28,6 +30,8 @@ export const AccountTable = ({ list, onUpdate }) => {
     const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog();
     const [formUpdate, setFormUpdate] = React.useState(null)
     const [isEditModalVisible, setIsEditModalVisible] = React.useState(false)
+    const [isSecretModalVisible, setIsSecretModalVisible] = React.useState(false)
+    const [secreteKey, setSecretKey] = React.useState({})
 
     const handleRemove = async (id) => {
         openConfirmDialog({
@@ -51,6 +55,17 @@ export const AccountTable = ({ list, onUpdate }) => {
         setFormUpdate(item)
         setIsEditModalVisible(true)
     }
+
+    const handleReset = async (id) => {
+        try {
+            let password = await resetAccountPassword(id)
+            setSecretKey(password)
+            setIsSecretModalVisible(true)
+        } catch (e) {
+            ErrorMessage(e)
+        }
+    }
+
 
     return (
         <>
@@ -76,6 +91,9 @@ export const AccountTable = ({ list, onUpdate }) => {
                                 }}
                                 onUpdateClick={() => {
                                     handleUpdate(n)
+                                }}
+                                onResetClick={() => {
+                                    handleReset(n?.id)
                                 }}
                             />)
                         }
@@ -108,13 +126,22 @@ export const AccountTable = ({ list, onUpdate }) => {
                     }}
                 />
             }
+            {
+                isSecretModalVisible &&
+                <ModalShowPassword
+                    secretKey={secreteKey}
+                    onClose={() => {
+                        setIsSecretModalVisible(false)
+                    }}
+                />
+            }
         </>
     )
 }
 
 
 
-const TableRow = ({ me, item, onRemoveClick, onUpdateClick }) => {
+const TableRow = ({ me, item, onRemoveClick, onUpdateClick, onResetClick }) => {
     return (
         <Table.Tr >
             <Table.Td>{item.username}</Table.Td>
@@ -132,6 +159,11 @@ const TableRow = ({ me, item, onRemoveClick, onUpdateClick }) => {
                 {
                     item?.id !== me?.id &&
                     <>
+                        <Tooltip label={`Reset Password`}>
+                            <SecondaryButton onClick={onResetClick}>
+                                <IoReloadOutline />
+                            </SecondaryButton>
+                        </Tooltip>
                         <Tooltip label={`Edit Account`}>
                             <SecondaryButton onClick={onUpdateClick}>
                                 <FaPencilAlt />

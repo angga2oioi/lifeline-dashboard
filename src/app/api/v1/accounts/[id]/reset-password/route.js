@@ -15,13 +15,14 @@ export async function PATCH(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE);
         }
 
+        const query = await params
         const canManage = await canIManage(account?.id, MANAGE_ACCOUNT_ROLES)
         if (!canManage) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
         
         
-        let data = await resetPassword(params?.id)
+        let data = await resetPassword(query?.id)
 
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,

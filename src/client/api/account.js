@@ -60,3 +60,10 @@ export const removeAccount = async (id) => {
     return data.data
 
 }
+
+export const resetAccountPassword = async (id) => {
+
+    const { data } = await Axios.patch(`/v1/accounts/${id}/reset-password`)
+    return data.data
+
+}
