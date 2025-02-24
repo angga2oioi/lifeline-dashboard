@@ -16,3 +16,8 @@ export const getInstanceStatus = async (instanceId) => {
     const { data } = await Axios.get(`/v1/instances/${instanceId}/status`)
     return data.data
 }
+
+export const findInstanceById = async (instanceId) => {
+    const { data } = await Axios.get(`/v1/instances/${instanceId}`)
+    return data.data
+}

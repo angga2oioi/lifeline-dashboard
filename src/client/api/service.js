@@ -12,6 +12,7 @@ export const listProjectServices = async (projectId) => {
     return data.data
 }
 
+
 export const createService = async (projectId, payload) => {
 
     const { data } = await Axios.post(`/v1/projects/${projectId}/services`, payload)
@@ -32,4 +33,9 @@ export const updateService = async (id, payload) => {
     const { data } = await Axios.put(`/v1/services/${id}`, payload)
     return data.data
 
+}
+
+export const findServicedById = async (serviceId) => {
+    const { data } = await Axios.get(`/v1/services/${serviceId}`)
+    return data.data
 }

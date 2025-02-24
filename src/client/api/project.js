@@ -53,3 +53,8 @@ export const listAllMyProject = async () => {
 
     return res
 }
+
+export const findProjectById = async (projectId) => {
+    const { data } = await Axios.get(`/v1/projects/${projectId}`)
+    return data.data
+}

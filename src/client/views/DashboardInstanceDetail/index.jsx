@@ -1,6 +1,8 @@
 //@ts-check
 "use client"
 import { paginateInstancesEvents } from "@/client/api/events";
+import { findInstanceById } from "@/client/api/instances";
+import { findServicedById } from "@/client/api/service";
 import PaginationButtons from "@/client/component/buttons/PaginationButtons";
 import useErrorMessage from "@/client/hooks/useErrorMessage";
 import { Table } from "@mantine/core";
@@ -12,12 +14,20 @@ import { MdOutlineFolderOff } from "react-icons/md";
 const DashboardInstanceDetailViews = ({ params }) => {
 
     const [list, setList] = React.useState(null)
+    const [instance, setInstance] = React.useState(null)
+    const [service, setService] = React.useState(null)
 
     const ErrorMessage = useErrorMessage()
     const searchParams = useSearchParams()
 
     const fetchData = async () => {
         try {
+            const i = await findInstanceById(params?.id)
+            setInstance(i)
+
+            const s = await findServicedById(i?.service)
+            setService(s)
+
             const query = Object.fromEntries(searchParams.entries())
             let l = await paginateInstancesEvents(params?.id, query)
 
@@ -34,6 +44,10 @@ const DashboardInstanceDetailViews = ({ params }) => {
 
     return (
         <>
+
+            <div className="flex justify-start">
+                <h1 className="text-lg">{service?.name} ({instance?.slug})</h1>
+            </div>
             <div className="w-full space-y-2">
                 {
                     list?.results?.length > 0 ?

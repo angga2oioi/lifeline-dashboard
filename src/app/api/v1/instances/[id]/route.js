@@ -54,7 +54,9 @@ export async function GET(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE);
         }
 
-        const instance = await findInstanceById(params?.id)
+        const query = await params;
+
+        const instance = await findInstanceById(query?.id)
         if (!instance) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
