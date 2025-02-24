@@ -1,12 +1,12 @@
 //@ts-check
 
-import {  NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE, SUCCESS_ERR_CODE, SUCCESS_ERR_MESSAGE } from "@/global/utils/constant";
+import { NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE, SUCCESS_ERR_CODE, SUCCESS_ERR_MESSAGE } from "@/global/utils/constant";
 import { HttpError, parseError } from "@/global/utils/functions";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { validateCookies } from "@/server/module/auth/auth.service";
 import { amIAMember } from "@/server/module/project/project.service";
-import { findInstanceById,  } from "@/server/module/instance/instance.service";
+import { findInstanceById, } from "@/server/module/instance/instance.service";
 import { paginateEvent } from "@/server/module/event/event.service";
 
 export async function GET(request, { params }) {
@@ -17,7 +17,8 @@ export async function GET(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE);
         }
 
-        const instance = await findInstanceById(params?.id)
+        const query = await params
+        const instance = await findInstanceById(query?.id)
         if (!instance) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
@@ -35,7 +36,7 @@ export async function GET(request, { params }) {
         } = Object.fromEntries(searchParams.entries())
 
         let data = await paginateEvent(
-            { instance: params?.id }
+            { instance: query?.id }
             , sortBy, limit, page)
 
         return NextResponse.json({
