@@ -3,10 +3,8 @@
 import React from "react"
 import { MdOutlineFolderOff } from "react-icons/md"
 import moment from "moment-timezone"
-import useErrorMessage from "@/client/hooks/useErrorMessage"
-import { getInstanceStatus } from "@/client/api/instances"
-import { delay } from "@/global/utils/functions"
 import Link from "next/link"
+import { useInstanceHooks } from "./hooks"
 
 const InstanceList = ({ list }) => {
 
@@ -36,25 +34,9 @@ const InstanceList = ({ list }) => {
 }
 
 const InstanceItem = ({ item }) => {
-    const ErrorMessage = useErrorMessage()
-    const [status, setStatus] = React.useState(null)
-
-    const fetchStatus = async () => {
-        try {
-            if (status !== null) {
-                await delay(30000)
-            }
-
-            let s = await getInstanceStatus(item?.id)
-            setStatus(s)
-        } catch (e) {
-            ErrorMessage(e)
-        }
-    }
-
-    React.useEffect(() => {
-        fetchStatus()
-    }, [status])
+    const {
+        status
+    } = useInstanceHooks(item?.id)
 
     return (
         <>

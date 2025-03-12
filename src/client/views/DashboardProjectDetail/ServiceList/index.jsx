@@ -1,11 +1,10 @@
 //@ts-check
-import { listServiceInstances } from "@/client/api/instances";
 import React from "react"
 import { MdOutlineFolderOff } from "react-icons/md";
 import InstanceList from "../InstanceList";
+import { useServiceHooks } from "./hooks";
 
 const ServiceList = ({ services }) => {
-  
 
     return (
         <>
@@ -30,37 +29,24 @@ const ServiceList = ({ services }) => {
                     </>
             }
 
-            
+
         </>
     )
 }
 
 const ServiceItem = ({ item }) => {
 
-    const [list, setList] = React.useState([])
-
-    const fetchInstances = async () => {
-        try {
-            let l = await listServiceInstances(item?.id)
-            setList(l)
-        } catch (e) {
-
-        }
-    }
-
-    React.useEffect(() => {
-        fetchInstances()
-    }, [])
+    const { list } = useServiceHooks(item?.id)
 
     return (
         <div className="border border-gray-200 rounded-xl w-full px-3 py-4 space-y-2">
             <div className="w-full flex justify-between">
                 <div className="text-lg">{item?.name}</div>
                 <div className="flex justify-end space-x-2">
-                    
+
                 </div>
             </div>
-            <InstanceList 
+            <InstanceList
                 list={list}
             />
         </div>
