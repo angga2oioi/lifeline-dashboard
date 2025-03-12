@@ -8,6 +8,7 @@ import serviceModel from "../service/service.model";
 import instanceModel from "./instance.model";
 import instanceBeatModel from "./instance.beat.model";
 import mongoose from "mongoose";
+import instanceMetricsModel from "./instance.metrics.model";
 const { ObjectId } = mongoose.Types
 
 export const createInstance = async (params) => {
@@ -80,6 +81,17 @@ export const registerBeat = async (id) => {
 
   await instanceBeatModel.create({
     instance: new ObjectId(id?.toString())
+  })
+
+  return null
+
+}
+
+export const registerInstanceMetrics = async (slug, metrics) => {
+
+  await instanceMetricsModel.create({
+    slug,
+    metrics
   })
 
   return null
@@ -185,7 +197,7 @@ export const getInstanceStatuses = async (instance) => {
         as: "beatData"
       }
     },
-    
+
     {
       $lookup: {
         from: "events",
@@ -251,7 +263,7 @@ export const getInstanceStatuses = async (instance) => {
         averageBeatsPerMinute: 1,
         lastBeatAt: 1,
         beatsLastMinute: 1,
-        totalEvents: 1 // 🎉 NEW FIELD: Total event count for the instance
+        totalEvents: 1
       }
     }
   ]
@@ -274,5 +286,22 @@ export const getInstanceStatuses = async (instance) => {
       totalEvents: n?.totalEvents
     }
   })?.[0]
+
+}
+
+export const listInstanceMetrics = async (slug) => {
+
+  let logs = await instanceMetricsModel.find({ slug })
+
+  return logs?.map((n) => {
+    return n?.metrics
+  })
+
+}
+
+export const getCurrentInstanceMetrics = async (slug) => {
+
+  const current = await instanceMetricsModel.findOne({ slug }).sort({ createdAt: -1 }).exec();
+  return current?.metrics;
 
 }

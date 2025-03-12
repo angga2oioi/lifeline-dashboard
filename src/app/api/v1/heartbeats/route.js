@@ -4,13 +4,13 @@ import { SUCCESS_ERR_CODE, SUCCESS_ERR_MESSAGE } from "@/global/utils/constant";
 import { parseError } from "@/global/utils/functions";
 import { NextResponse } from "next/server";
 import { validateProjectSignature } from "@/server/module/project/project.service";
-import { createInstance, registerBeat } from "@/server/module/instance/instance.service";
+import { createInstance, registerBeat, registerInstanceMetrics } from "@/server/module/instance/instance.service";
 
 export async function POST(request, { params }) {
     try {
 
         const headers = Object.fromEntries(request.headers);
-        
+
         const { searchParams } = new URL(request.nextUrl);
         const query = Object.fromEntries(searchParams.entries())
         const body = await request.json();
@@ -22,6 +22,10 @@ export async function POST(request, { params }) {
         })
 
         await registerBeat(instance?.id)
+
+        if (body?.metrics) {
+            await registerInstanceMetrics(instance?.slug, body?.metrics)
+        }
 
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,
