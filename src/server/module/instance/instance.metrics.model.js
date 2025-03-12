@@ -2,13 +2,14 @@
 import mongoose from "../../utils/mongoose";
 import { toJSON, paginate } from "../../utils/mongoose/plugins";
 
-const { ObjectId, String, Mixed } = mongoose.Schema.Types;
+const {  String, Mixed } = mongoose.Schema.Types;
 
 const InstanceMetricsSchema = new mongoose.Schema(
     {
         slug: {
             type: String,
             required: true,
+            unique: true,
             index: true,
         },
         metrics: {

@@ -9,10 +9,11 @@ import { useSearchParams } from "next/navigation";
 import React from "react";
 import ServiceList from "./ServiceList";
 import { findProjectById } from "@/client/api/project";
+import MetricList from "./MetricList";
 const DashboardProjectDetailViews = ({ params }) => {
     const [isCreateModalVisible, setIsCreateModalVisible] = React.useState(false)
     const [list, setList] = React.useState([])
-    const [project,setProject] = React.useState(null)
+    const [project, setProject] = React.useState(null)
 
     const ErrorMessage = useErrorMessage()
     const searchParams = useSearchParams()
@@ -49,6 +50,9 @@ const DashboardProjectDetailViews = ({ params }) => {
                         </PrimaryButton>
                     </div>
                 </div>
+                <MetricList
+                    projectId={params?.id}
+                />
                 <ServiceList
                     list={list}
                     onUpdate={fetchData}

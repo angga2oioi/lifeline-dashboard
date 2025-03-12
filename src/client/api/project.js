@@ -58,3 +58,8 @@ export const findProjectById = async (projectId) => {
     const { data } = await Axios.get(`/v1/projects/${projectId}`)
     return data.data
 }
+
+export const getProjectMetric = async (projectId) => {
+    const { data } = await Axios.get(`/v1/projects/${projectId}/metrics`)
+    return data.data
+}

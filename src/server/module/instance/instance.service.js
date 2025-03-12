@@ -23,31 +23,13 @@ export const createInstance = async (params) => {
     throw HttpError(INVALID_INPUT_ERR_CODE, v.errors);
   }
 
-  const testData = await instanceModel.findOne({
+  const payload = {
     project: new ObjectId(params?.project),
     service: new ObjectId(params?.serviceId),
     slug: createSlug(params?.instanceId),
-  })
-
-  if (testData) {
-    return testData?.toJSON()
   }
 
-  const project = await projectModel.findById(params?.project)
-  if (!project) {
-    throw HttpError(NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE)
-  }
-
-  const service = await serviceModel.findById(params?.serviceId)
-  if (!service || (service?.project && service?.project?.toString() !== project?._id?.toString())) {
-    throw HttpError(NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE)
-  }
-
-  const raw = await instanceModel.create({
-    project: project?._id,
-    service: service._id,
-    slug: createSlug(params?.instanceId),
-  })
+  const raw = await instanceModel.findOneAndUpdate(payload, { $set: payload }, { upsert: true })
 
   return raw?.toJSON()
 
@@ -88,8 +70,15 @@ export const registerBeat = async (id) => {
 }
 
 export const registerInstanceMetrics = async (params) => {
+  if (!params?.slug) {
+    return null
+  }
 
-  await instanceMetricsModel.create(params)
+  await instanceMetricsModel.findOneAndUpdate({
+    slug: params?.slug
+  }, {
+    $set: { ...params }
+  }, { upsert: true })
 
   return null
 

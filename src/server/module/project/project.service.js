@@ -524,9 +524,11 @@ export const getProjectMetrics = async (projectId) => {
 
     if (slugs.length === 0) return [];
 
-    const res = await instanceMetricsModel.find({
-        slug: { $in: slugs }
-    }).sort({ createdAt: -1 });
+    const res = await Promise.all(slugs?.map((slug) => {
+        return instanceMetricsModel.findOne({
+            slug
+        }).sort({ createdAt: -1 })
+    }))
 
-    return res.map(n => n?.metrics).filter(Boolean);
+    return res
 }

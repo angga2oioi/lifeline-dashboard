@@ -43,6 +43,32 @@ export const sanitizeObject = (params) => {
     return obj;
 };
 
+export const num2Float = (number) => {
+    if (isNaN(number)) {
+        return 0;
+    }
+
+    return parseFloat(number);
+};
+export const formatBytes = (bytes, decimals = 1) => {
+    if (bytes === 0) return '0 Bytes';
+
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + ' ' + sizes[i];
+}
+
+
+export const num2Percent = (number) => {
+    if (isNaN(number)) {
+        return `0%`;
+    }
+
+    return num2Float(number * 100)?.toFixed(1) + "%";
+};
+
 export const num2Int = (number) => {
     if (isNaN(number)) {
         return 0;
@@ -52,7 +78,7 @@ export const num2Int = (number) => {
 };
 
 export const sanitizeEmail = (email) => {
-    const [name, domain=""] = striptags(email?.toString())?.split("@")
+    const [name, domain = ""] = striptags(email?.toString())?.split("@")
 
     let realName = name?.split("+")?.[0]
 
@@ -94,6 +120,6 @@ export const createSlug = (string) => {
         .replace(/-{2,}/g, "-");
 };
 
-export const delay = (ms)=>{
+export const delay = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
