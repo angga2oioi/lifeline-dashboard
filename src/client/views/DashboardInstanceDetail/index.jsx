@@ -1,46 +1,19 @@
 //@ts-check
 "use client"
-import { paginateInstancesEvents } from "@/client/api/events";
-import { findInstanceById } from "@/client/api/instances";
-import { findServicedById } from "@/client/api/service";
 import PaginationButtons from "@/client/component/buttons/PaginationButtons";
-import useErrorMessage from "@/client/hooks/useErrorMessage";
 import { Table } from "@mantine/core";
 import moment from "moment-timezone";
-import { useSearchParams } from "next/navigation";
 import React from "react";
 import { MdOutlineFolderOff } from "react-icons/md";
+import { useInstanceHooks } from "./hooks";
 
 const DashboardInstanceDetailViews = ({ params }) => {
 
-    const [list, setList] = React.useState(null)
-    const [instance, setInstance] = React.useState(null)
-    const [service, setService] = React.useState(null)
-
-    const ErrorMessage = useErrorMessage()
-    const searchParams = useSearchParams()
-
-    const fetchData = async () => {
-        try {
-            const i = await findInstanceById(params?.id)
-            setInstance(i)
-
-            const s = await findServicedById(i?.service)
-            setService(s)
-
-            const query = Object.fromEntries(searchParams.entries())
-            let l = await paginateInstancesEvents(params?.id, query)
-
-            setList(l)
-
-        } catch (e) {
-            ErrorMessage(e)
-        }
-    }
-
-    React.useEffect(() => {
-        fetchData()
-    }, [searchParams])
+    const {
+        service,
+        instance,
+        list,
+    } = useInstanceHooks(params)
 
     return (
         <>
