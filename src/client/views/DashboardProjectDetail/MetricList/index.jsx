@@ -10,7 +10,7 @@ import { CiHardDrive } from "react-icons/ci";
 const MetricList = ({ projectId }) => {
 
     const ErrorMessage = useErrorMessage()
-    const [list, setList] = React.useState([])
+    const [list, setList] = React.useState(null)
 
     const fetchData = async () => {
         try {

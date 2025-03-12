@@ -21,14 +21,16 @@ export async function PUT(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        const isMember = await amIAMember(account?.id, params?.id)
+        const query = await params
+
+        const isMember = await amIAMember(account?.id, query?.id)
         if (!isMember) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
         const body = await request.json();
         let accounts = Array.from(new Set([...(body?.accounts || []), account?.id]))
-        await updateProject(params?.id, {
+        await updateProject(query?.id, {
             ...body,
             accounts
         })
@@ -58,12 +60,14 @@ export async function DELETE(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        const isMember = await amIAMember(account?.id, params?.id)
+        const query = await params
+
+        const isMember = await amIAMember(account?.id, query?.id)
         if (!isMember) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        await removeProject(params?.id)
+        await removeProject(query?.id)
 
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,
@@ -84,12 +88,14 @@ export async function GET(request, { params }) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE);
         }
 
-        const isMember = await amIAMember(account?.id, params?.id)
+        const query = await params
+
+        const isMember = await amIAMember(account?.id, query?.id)
         if (!isMember) {
             throw HttpError(NO_ACCESS_ERR_CODE, NO_ACCESS_ERR_MESSAGE)
         }
 
-        let data = await findProjectById(params?.id)
+        let data = await findProjectById(query?.id)
 
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,
