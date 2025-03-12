@@ -515,22 +515,18 @@ export const amIAMember = async (accountId, projectId) => {
 }
 
 export const getProjectMetrics = async (projectId) => {
-    let res = await instanceMetricsModel.aggregate([
-        {
-            $match: { project: new ObjectId(projectId?.toString()) }
-        },
-        {
-            $sort: { slug: 1, createdAt: -1 }
-        },
-        {
-            $group: {
-                _id: "$slug",
-                latestEntry: { $first: "$$ROOT" }
-            }
-        },
-        {
-            $replaceRoot: { newRoot: "$latestEntry" }
-        }
-    ])
-    return res
+    if (!projectId) return [];
+
+    const slugs = await instanceModel.aggregate([
+        { $match: { project: new ObjectId(projectId.toString()) } },
+        { $group: { _id: "$slug" } }
+    ]).then(results => results.map(n => n?._id).filter(Boolean)); // Ensure valid slugs
+
+    if (slugs.length === 0) return [];
+
+    const res = await instanceMetricsModel.find({
+        slug: { $in: slugs }
+    }).sort({ createdAt: -1 });
+
+    return res.map(n => n?.metrics).filter(Boolean);
 }

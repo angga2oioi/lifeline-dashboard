@@ -25,7 +25,6 @@ export async function POST(request, { params }) {
 
         if (body?.metrics) {
             registerInstanceMetrics({
-                project: instance?.project,
                 slug: instance?.slug,
                 metrics: body?.metrics
             }).catch((e)=>console.error(e))

@@ -6,11 +6,6 @@ const { ObjectId, String, Mixed } = mongoose.Schema.Types;
 
 const InstanceMetricsSchema = new mongoose.Schema(
     {
-        project: {
-            type: ObjectId,
-            required: true,
-            index: true,
-        },
         slug: {
             type: String,
             required: true,
