@@ -1,61 +1,21 @@
 //@ts-check
 import { listServiceInstances } from "@/client/api/instances";
-import { removeService } from "@/client/api/service"
-import { DangerButton } from "@/client/component/buttons/DangerButton";
-import { SecondaryButton } from "@/client/component/buttons/SecondaryButton";
-import ModalManageService from "@/client/component/modals/ModalManageService";
-import { useConfirmDialog } from "@/client/hooks/useConfirmDialog"
-import useErrorMessage from "@/client/hooks/useErrorMessage"
-import { Tooltip } from "@mantine/core";
 import React from "react"
-import { FaPencilAlt, FaTrash } from "react-icons/fa";
 import { MdOutlineFolderOff } from "react-icons/md";
 import InstanceList from "../InstanceList";
 
-const ServiceList = ({ list, onUpdate }) => {
-    const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog();
-    const ErrorMessage = useErrorMessage()
-    const [formUpdate, setFormUpdate] = React.useState(null)
-    const [isEditModalVisible, setIsEditModalVisible] = React.useState(false)
-
-    const handleRemove = async (id) => {
-        openConfirmDialog({
-            title: 'Remove Service',
-            message: 'Are you sure you want to remove this service? This action cannot be undone.',
-            confirmLabel: 'Delete',
-            cancelLabel: 'Cancel',
-            onConfirm: async () => {
-                try {
-                    await removeService(id)
-                    onUpdate()
-                } catch (e) {
-                    ErrorMessage(e)
-                }
-            },
-            onCancel: () => console.log('Delete cancelled'),
-        })
-    }
-
-    const handleUpdate = async (item) => {
-        setFormUpdate(item)
-        setIsEditModalVisible(true)
-    }
+const ServiceList = ({ services }) => {
+  
 
     return (
         <>
             {
-                list?.length > 0 ?
+                services?.length > 0 ?
                     <>
                         {
-                            list?.map((n) => <ServiceItem
+                            services?.map((n) => <ServiceItem
                                 key={n?.id}
                                 item={n}
-                                onRemoveClick={() => {
-                                    handleRemove(n?.id)
-                                }}
-                                onUpdateClick={() => {
-                                    handleUpdate(n)
-                                }}
                             />)
                         }
                     </> :
@@ -70,25 +30,12 @@ const ServiceList = ({ list, onUpdate }) => {
                     </>
             }
 
-            <ConfirmDialogComponent />
-            {isEditModalVisible &&
-                <ModalManageService
-                    mode={`edit`}
-                    title={`Update Service`}
-                    initialValue={formUpdate}
-                    onCancel={() => {
-                        setIsEditModalVisible(false)
-                    }}
-                    onSubmit={() => {
-                        setIsEditModalVisible(false)
-                        onUpdate()
-                    }}
-                />}
+            
         </>
     )
 }
 
-const ServiceItem = ({ item, onRemoveClick, onUpdateClick }) => {
+const ServiceItem = ({ item }) => {
 
     const [list, setList] = React.useState([])
 
@@ -110,16 +57,7 @@ const ServiceItem = ({ item, onRemoveClick, onUpdateClick }) => {
             <div className="w-full flex justify-between">
                 <div className="text-lg">{item?.name}</div>
                 <div className="flex justify-end space-x-2">
-                    <Tooltip label={`Update Service`}>
-                        <SecondaryButton onClick={onUpdateClick}>
-                            <FaPencilAlt />
-                        </SecondaryButton>
-                    </Tooltip>
-                    <Tooltip label={`Remove Account`}>
-                        <DangerButton onClick={onRemoveClick}>
-                            <FaTrash />
-                        </DangerButton>
-                    </Tooltip>
+                    
                 </div>
             </div>
             <InstanceList 
