@@ -3,38 +3,62 @@
 import React from "react"
 
 import { PrimaryButton } from "@/client/component/buttons/PrimaryButton"
-import useErrorMessage from "@/client/hooks/useErrorMessage"
-import { paginateMyProject } from "@/client/api/project"
 import { ProjectTable } from "./ProjectTable"
-import { useSearchParams } from "next/navigation"
 import SearchInput from "@/client/component/inputs/SearchInput"
 import ModalManageProject from "@/client/component/modals/ModalManageProject"
 import ModalShowSecret from "@/client/component/modals/ModalShowSecret"
+import { useProjectHooks } from "./hooks"
+import { Tooltip } from "@mantine/core"
+import { SecondaryButton } from "@/client/component/buttons/SecondaryButton"
+import { IoReload } from "react-icons/io5"
+import { FaFileDownload, FaPencilAlt, FaTrash } from "react-icons/fa"
+import { DangerButton } from "@/client/component/buttons/DangerButton"
+import PaginationButtons from "@/client/component/buttons/PaginationButtons"
 const DashboardProjectViews = () => {
 
-    const ErrorMessage = useErrorMessage()
-    const searchParams = useSearchParams()
-
-    const [list, setList] = React.useState({})
     const [isCreateModalVisible, setIsCreateModalVisible] = React.useState(false)
     const [isSecretModalVisible, setIsSecretModalVisible] = React.useState(false)
     const [secreteKey, setSecretKey] = React.useState({})
+    const [isEditModalVisible, setIsEditModalVisible] = React.useState(false)
+    const [formUpdate, setFormUpdate] = React.useState(null)
 
-    const fetchData = async () => {
-        try {
-            const query = Object.fromEntries(searchParams.entries())
+    const {
+        list,
+        fetchData,
+        ConfirmDialogComponent,
+        handleDownload,
+        handleRemove,
 
-            let l = await paginateMyProject(query)
-            setList(l)
+    } = useProjectHooks()
 
-        } catch (e) {
-            ErrorMessage(e)
+    const formattedProject = list?.results?.map((n) => {
+        return {
+            id: n?.id,
+            name: n?.name,
+            totalServices: n?.totalServices,
+            totalInstances: n?.totalInstances,
+            totalEvents: n?.totalEvents,
+            action: (
+                <>
+                    <Tooltip label={`Download env`}>
+                        <SecondaryButton onClick={() => { handleDownload(n?.id) }}>
+                            <FaFileDownload />
+                        </SecondaryButton>
+                    </Tooltip>
+                    <Tooltip label={`Edit Project`}>
+                        <SecondaryButton onClick={() => { setFormUpdate(n); setIsEditModalVisible(true) }}>
+                            <FaPencilAlt />
+                        </SecondaryButton>
+                    </Tooltip>
+                    <Tooltip label={`Delete Project`}>
+                        <DangerButton onClick={() => { handleRemove(n?.id) }}>
+                            <FaTrash />
+                        </DangerButton>
+                    </Tooltip>
+                </>
+            )
         }
-    }
-
-    React.useEffect(() => {
-        fetchData()
-    }, [searchParams])
+    })
 
     return (
         <>
@@ -49,8 +73,33 @@ const DashboardProjectViews = () => {
                         Create Project
                     </PrimaryButton>
                 </div>
-                <ProjectTable list={list} onUpdate={fetchData} />
+                <ProjectTable list={formattedProject} />
             </div>
+            <ConfirmDialogComponent />
+            {
+                list?.totalResults > 0 &&
+                <div className="w-full flex justify-end">
+                    <PaginationButtons
+                        total={list?.totalPages || 1}
+                        value={list?.page || 1}
+                    />
+                </div>
+            }
+            {
+                isEditModalVisible &&
+                <ModalManageProject
+                    mode={`edit`}
+                    initialValue={formUpdate}
+                    title={`Update Project`}
+                    onCancel={() => {
+                        setIsEditModalVisible(false)
+                    }}
+                    onSubmit={() => {
+                        setIsEditModalVisible(false)
+                        fetchData()
+                    }}
+                />
+            }
             {
                 isCreateModalVisible &&
                 <ModalManageProject
@@ -67,10 +116,10 @@ const DashboardProjectViews = () => {
                 />
             }
             {
-                isSecretModalVisible && 
-                <ModalShowSecret 
+                isSecretModalVisible &&
+                <ModalShowSecret
                     secretKey={secreteKey}
-                    onClose={()=>{
+                    onClose={() => {
                         setIsSecretModalVisible(false)
                     }}
                 />
