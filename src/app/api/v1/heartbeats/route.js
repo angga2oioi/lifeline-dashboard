@@ -24,7 +24,11 @@ export async function POST(request, { params }) {
         await registerBeat(instance?.id)
 
         if (body?.metrics) {
-            await registerInstanceMetrics(instance?.slug, body?.metrics)
+            registerInstanceMetrics({
+                project: instance?.project,
+                slug: instance?.slug,
+                metrics: body?.metrics
+            }).catch((e)=>console.error(e))
         }
 
         return NextResponse.json({

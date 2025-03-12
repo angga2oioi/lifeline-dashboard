@@ -16,6 +16,7 @@ import serviceModel from "../service/service.model"
 import instanceModel from "../instance/instance.model"
 import instanceBeatModel from "../instance/instance.beat.model"
 import eventModel from "../event/event.model"
+import instanceMetricsModel from "../instance/instance.metrics.model"
 const {
     ObjectId
 } = mongoose.Types
@@ -472,7 +473,7 @@ export const validateProjectSignature = async (headers, body = {}, query = {}) =
     if (parsedTimestamp > nowTime) {
         throw HttpError(NO_ACCESS_ERR_CODE, `Time travelling is currently impossible`);
     }
-    
+
     let timeDiff = Math.abs(nowTime - parsedTimestamp);
     if (timeDiff > 5 * 60 * 1000) {
         throw HttpError(NO_ACCESS_ERR_CODE, `Request expired`);
@@ -511,4 +512,25 @@ export const amIAMember = async (accountId, projectId) => {
 
     return true
 
+}
+
+export const getProjectMetrics = async (projectId) => {
+    let res = await instanceMetricsModel.aggregate([
+        {
+            $match: { project: new ObjectId(projectId?.toString()) }
+        },
+        {
+            $sort: { slug: 1, createdAt: -1 }
+        },
+        {
+            $group: {
+                _id: "$slug",
+                latestEntry: { $first: "$$ROOT" }
+            }
+        },
+        {
+            $replaceRoot: { newRoot: "$latestEntry" }
+        }
+    ])
+    return res
 }

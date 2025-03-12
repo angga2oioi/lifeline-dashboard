@@ -4,7 +4,6 @@ import { listProjectServices } from "@/client/api/service";
 import { PrimaryButton } from "@/client/component/buttons/PrimaryButton";
 import SearchInput from "@/client/component/inputs/SearchInput";
 import ModalManageService from "@/client/component/modals/ModalManageService";
-import ModalCreateService from "@/client/component/modals/ModalManageService";
 import useErrorMessage from "@/client/hooks/useErrorMessage";
 import { useSearchParams } from "next/navigation";
 import React from "react";

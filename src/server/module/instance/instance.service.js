@@ -87,12 +87,9 @@ export const registerBeat = async (id) => {
 
 }
 
-export const registerInstanceMetrics = async (slug, metrics) => {
+export const registerInstanceMetrics = async (params) => {
 
-  await instanceMetricsModel.create({
-    slug,
-    metrics
-  })
+  await instanceMetricsModel.create(params)
 
   return null
 
