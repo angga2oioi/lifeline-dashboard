@@ -7,8 +7,14 @@ const Axios = axios.create({
     withCredentials: true,
 });
 
-export const accountLogin = async (csrf, payload) => {
+export const getCsrfToken = async () => {
+    const { data } = await Axios.get(`/v1/auths/csrf`)
+    return data.data
+}
 
+export const accountLogin = async ( payload) => {
+
+    const csrf = await getCsrfToken()
     const { data } = await Axios.post(`/v1/auths/login`, payload, {
         headers: {
             "X-CSRF-TOKEN": csrf
@@ -26,8 +32,8 @@ export const accountLogout = async () => {
 }
 
 
-export const setupAccount = async (csrf, payload) => {
-    
+export const setupAccount = async ( payload) => {
+    const csrf = await getCsrfToken()
     const { data } = await Axios.post(`/v1/auths/setup`, payload, {
         headers: {
             "X-CSRF-TOKEN": csrf

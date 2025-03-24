@@ -16,7 +16,8 @@ export async function POST(request, { params }) {
         let { accessToken, refreshToken } = createTokens(account)
 
         setAuthCookies(cookieStore, accessToken, refreshToken)
-
+        delete account.password
+        
         return NextResponse.json({
             error: SUCCESS_ERR_CODE,
             message: SUCCESS_ERR_MESSAGE,

@@ -6,7 +6,7 @@ import { ContextMenuProvider } from "mantine-contextmenu";
 import { Notifications } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
 import { MantineProvider } from "@mantine/core";
-const App = ({ children, nonce, csrf, account }) => {
+const App = ({ children, nonce, account }) => {
 
     return (
         <MantineProvider
@@ -16,7 +16,7 @@ const App = ({ children, nonce, csrf, account }) => {
             <Notifications />
             <ModalsProvider>
                 <ContextMenuProvider>
-                    <AppContext.Provider value={{ nonce, csrf, account }}>
+                    <AppContext.Provider value={{ nonce, account }}>
                         {children}
                     </AppContext.Provider>
                 </ContextMenuProvider>

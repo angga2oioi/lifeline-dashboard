@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies, headers } from "next/headers"
-import { COOKIE_OPTIONS, CSRF_TOKEN_COOKIE_NAME } from "./global/utils/constant";
+import { COOKIE_OPTIONS, CSRF_TOKEN_SECRET_COOKIE_NAME } from "./global/utils/constant";
 
 export async function middleware(request) {
     const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
@@ -38,10 +38,10 @@ export async function middleware(request) {
 
     let head = await headers();
     let cookieStore = await cookies()
-    let csrfCookie = cookieStore.get(CSRF_TOKEN_COOKIE_NAME)?.value
+    let csrfCookie = cookieStore.get(CSRF_TOKEN_SECRET_COOKIE_NAME)?.value
     if (!csrfCookie) {
         csrfCookie = Buffer.from(crypto.randomUUID()).toString("base64");
-        cookieStore.set(CSRF_TOKEN_COOKIE_NAME, csrfCookie, COOKIE_OPTIONS);
+        cookieStore.set(CSRF_TOKEN_SECRET_COOKIE_NAME, csrfCookie, COOKIE_OPTIONS);
     }
 
     requestHeaders.set("x-nonce", nonce);

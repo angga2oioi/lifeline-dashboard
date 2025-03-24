@@ -1,11 +1,12 @@
 //@ts-check
 
-import { ACCOUNT_COOKIE_NAME, COOKIE_OPTIONS, CSRF_TOKEN_COOKIE_NAME, INVALID_INPUT_ERR_CODE, MANAGE_ACCOUNT_ROLES, NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE, REFRESH_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_NAME } from "@/global/utils/constant";
+import { ACCOUNT_COOKIE_NAME, COOKIE_OPTIONS,  CSRF_TOKEN_SECRET_COOKIE_NAME, INVALID_INPUT_ERR_CODE, MANAGE_ACCOUNT_ROLES, NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE, REFRESH_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_NAME } from "@/global/utils/constant";
 import { HttpError } from "@/global/utils/functions";
 import jwt from "jsonwebtoken"
 import { Validator } from "node-input-validator";
 import accountModel from "../account/account.model";
 import * as bcrypt from "bcryptjs"
+import crypto from "crypto";
 
 export const createTokens = (account) => {
     const accessToken = jwt.sign({ id: account.id, username: account?.username, roles: account?.roles }, process?.env?.ACCOUNT_TOKEN_JWT_SECRET, { expiresIn: 60 * 60 });
@@ -124,18 +125,21 @@ export const validateCSRFToken = async (cookies, headers) => {
     let cookieStore = await cookies()
     let headStore = await headers()
 
-    let csrfCookie = cookieStore.get(CSRF_TOKEN_COOKIE_NAME)?.value
+    let csrfSecret = cookieStore.get(CSRF_TOKEN_SECRET_COOKIE_NAME)?.value
     let csrfHead = headStore.get("x-csrf-token")
 
-    if (!csrfCookie || !csrfHead) {
+    if (!csrfSecret || !csrfHead) {
         return false;
     }
 
-    if (csrfCookie !== csrfHead) {
+    const expectedToken = crypto.createHmac('sha256', csrfSecret).digest('hex');
+
+
+    if (expectedToken !== csrfHead) {
         return false
     }
 
     let newToken = Buffer.from(crypto.randomUUID()).toString("base64");
-    cookieStore.set(CSRF_TOKEN_COOKIE_NAME, newToken, COOKIE_OPTIONS);
+    cookieStore.set(CSRF_TOKEN_SECRET_COOKIE_NAME, newToken, COOKIE_OPTIONS);
     return true
 }

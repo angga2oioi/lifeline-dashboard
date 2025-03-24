@@ -8,13 +8,12 @@ import useErrorMessage from "@/client/hooks/useErrorMessage";
 
 export const useSetupHooks = () => {
 
-    const { csrf } = React.useContext(AppContext)
     const router = useRouter()
     const ErrorMessage = useErrorMessage()
 
     const handleSetup = async (form) => {
         try {
-            await setupAccount(csrf, form)
+            await setupAccount(form)
             router.push(`/dashboard`)
         } catch (e) {
             ErrorMessage(e)
