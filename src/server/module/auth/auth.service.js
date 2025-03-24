@@ -1,6 +1,6 @@
 //@ts-check
 
-import { ACCOUNT_COOKIE_NAME, COOKIE_OPTIONS,  CSRF_TOKEN_SECRET_COOKIE_NAME, INVALID_INPUT_ERR_CODE, MANAGE_ACCOUNT_ROLES, NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE, REFRESH_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_NAME } from "@/global/utils/constant";
+import { ACCOUNT_COOKIE_NAME, COOKIE_OPTIONS, CSRF_TOKEN_SECRET_COOKIE_NAME, INVALID_INPUT_ERR_CODE, MANAGE_ACCOUNT_ROLES, NOT_FOUND_ERR_CODE, NOT_FOUND_ERR_MESSAGE, REFRESH_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_NAME } from "@/global/utils/constant";
 import { HttpError } from "@/global/utils/functions";
 import jwt from "jsonwebtoken"
 import { Validator } from "node-input-validator";
@@ -140,6 +140,14 @@ export const validateCSRFToken = async (cookies, headers) => {
     }
 
     let newToken = Buffer.from(crypto.randomUUID()).toString("base64");
-    cookieStore.set(CSRF_TOKEN_SECRET_COOKIE_NAME, newToken, COOKIE_OPTIONS);
+    //remove cookie when success to make subsequent request to reload the page to get new token
+    cookieStore.set(CSRF_TOKEN_SECRET_COOKIE_NAME, "", {
+        path: "/",
+        maxAge: 1,
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+    });
+    
     return true
 }

@@ -29,6 +29,8 @@ export async function middleware(request) {
         .trim();
 
     const requestHeaders = new Headers(request.headers);
+    // ❌ Remove the vulnerable header
+    requestHeaders.delete("x-middleware-subrequest");
 
     // Setting request headers
     requestHeaders.set(

@@ -9,12 +9,14 @@ const Axios = axios.create({
 
 export const getCsrfToken = async () => {
     const { data } = await Axios.get(`/v1/auths/csrf`)
-    return data.data
+    
+    return data.csrfToken
 }
 
 export const accountLogin = async ( payload) => {
 
     const csrf = await getCsrfToken()
+    
     const { data } = await Axios.post(`/v1/auths/login`, payload, {
         headers: {
             "X-CSRF-TOKEN": csrf
