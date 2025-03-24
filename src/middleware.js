@@ -30,7 +30,9 @@ export async function middleware(request) {
 
     const requestHeaders = new Headers(request.headers);
     // ❌ Remove the vulnerable header
-    requestHeaders.delete("x-middleware-subrequest");
+    if (request.headers.get("x-middleware-subrequest")) {
+        return new NextResponse("Forbidden", { status: 403 });
+    }
 
     // Setting request headers
     requestHeaders.set(
