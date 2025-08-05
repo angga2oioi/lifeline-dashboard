@@ -6,6 +6,7 @@ import moment from "moment-timezone";
 import React from "react";
 import { MdOutlineFolderOff } from "react-icons/md";
 import { useInstanceHooks } from "./hooks";
+import nl2br from "react-nl2br";
 
 const DashboardInstanceDetailViews = ({ params }) => {
 
@@ -80,7 +81,7 @@ const MessageList = ({ title, messages }) => {
         <>
             {messages?.map((n, i) => <div key={`message-${title}-${i}`} className="w-full mt-2 px-3 py-2 border-t bg-gray-200 rounded-xl">
                 <div>
-                    {n?.message}
+                    {nl2br(n?.message)}
                 </div>
                 <div className="w-full flex justify-end space-x-2">
                     <span>Total: {n?.total}</span>
